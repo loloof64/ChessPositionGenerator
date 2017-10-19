@@ -17,7 +17,7 @@ export default class ChessBoard extends Component {
 
     render() {
         return (
-            <Zone>
+            <Zone cellsSize={this.props.cellsSize}>
             </Zone>
         )
     }
