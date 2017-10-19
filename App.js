@@ -1,11 +1,6 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
 import React, { Component } from 'react';
 import styled from 'styled-components/native';
+import ChessBoard from './components/chessboard';
 
 const TopPanel = styled.View`
   flex: 1;
@@ -30,11 +25,7 @@ export default class App extends Component {
   render() {
     return (
       <TopPanel>
-        <Button>
-          <ButtonText>
-            Hello
-          </ButtonText>
-        </Button>
+        <ChessBoard cellsSize={10} />
       </TopPanel>
     );
   }
