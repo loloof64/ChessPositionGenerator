@@ -31,6 +31,25 @@ const BlackCell = Cell.extend`
     background-color: #8B4513;
 `;
 
+const Coord = styled.Text.attrs({
+    size: props => parseInt(props.cellsSize) || 20
+}) `
+    font-weight: bold;
+    font-size: ${props => parseInt(props.size * 0.5)}
+    color: #FFFFFF;
+    position: absolute;
+`;
+
+const FileCoord = Coord.extend`
+    left: ${props => parseInt(props.size * ((props.file || 0) + 0.8))}
+    top: ${props => parseInt(props.size * (props.areOnTop ? -0.10 : 8.40))}
+`;
+
+const RankCoord = Coord.extend`
+    top: ${props => parseInt(props.size * ((props.rank || 0) + 0.7))}
+    left: ${props => parseInt(props.size * (props.areOnTop ? 0.10 : 8.60))}
+`;
+
 @observer
 export default class ChessBoard extends Component {
 
@@ -38,6 +57,10 @@ export default class ChessBoard extends Component {
         return (
             <Zone cellsSize={this.props.cellsSize}>
                 {this.renderAllRanks()}
+                {this.renderFileCoords(true)}
+                {this.renderFileCoords(false)}
+                {this.renderRankCoords(true)}
+                {this.renderRankCoords(false)}
             </Zone>
         )
     }
@@ -71,6 +94,46 @@ export default class ChessBoard extends Component {
                     />
                 );
             }
+        });
+    }
+
+    renderFileCoords(areOnTop) {
+        let filesCoords = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+        if (this.props.reversed) {
+            filesCoords = filesCoords.reverse();
+        }
+        return _.map(filesCoords, (currFileCoord, currFile) => {
+            const randomKey = parseInt(Math.random() * 1000000000).toString();
+            return (
+                <FileCoord
+                    key={randomKey}
+                    file={currFile}
+                    areOnTop={areOnTop}
+                    cellsSize={this.props.cellsSize}
+                >
+                    {currFileCoord}
+                </FileCoord>
+            );
+        });
+    }
+
+    renderRankCoords(areOnTop) {
+        let rankCoords = ['8', '7', '6', '5', '4', '3', '2', '1'];
+        if (this.props.reversed) {
+            rankCoords = rankCoords.reverse();
+        }
+        return _.map(rankCoords, (currRankCoord, currRank) => {
+            const randomKey = parseInt(Math.random() * 1000000000).toString();
+            return (
+                <RankCoord
+                    key={randomKey}
+                    rank={currRank}
+                    areOnTop={areOnTop}
+                    cellsSize={this.props.cellsSize}
+                >
+                    {currRankCoord}
+                </RankCoord>
+            );
         });
     }
 
