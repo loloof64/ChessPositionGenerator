@@ -25,7 +25,7 @@ export default class App extends Component {
   render() {
     return (
       <TopPanel>
-        <ChessBoard cellsSize={10} />
+        <ChessBoard cellsSize={40} />
       </TopPanel>
     );
   }
