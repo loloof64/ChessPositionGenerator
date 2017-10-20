@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import _ from 'underscore';
+import { Chess } from 'chess.js';
 
 const Zone = styled.View.attrs({
     cellsSize: props => parseInt(props.cellsSize) || 20,
@@ -50,8 +51,25 @@ const RankCoord = Coord.extend`
     left: ${props => parseInt(props.size * (props.areOnTop ? 0.10 : 8.60))}
 `;
 
+const TurnIndicator = styled.View.attrs({
+    size: props => parseInt(props.cellsSize) || 20,
+    location: props => parseInt(props.cellsSize * 8.5)
+}) `
+    position: absolute;
+    background-color: ${props => props.blackTurn ? '#000000' : '#FFFFFF'};
+    width: ${props => props.size};
+    height: ${props => props.size};
+    left: ${props => props.location};
+    top: ${props => props.location};
+`;
+
 @observer
 export default class ChessBoard extends Component {
+
+    constructor(props) {
+        super(props);
+        this._chess = Chess('K1k5/8/8/8/8/8/8/8 w - - 0 1');
+    }
 
     render() {
         return (
@@ -61,6 +79,7 @@ export default class ChessBoard extends Component {
                 {this.renderFileCoords(false)}
                 {this.renderRankCoords(true)}
                 {this.renderRankCoords(false)}
+                {this.renderPlayerTurnIndicator()}
             </Zone>
         )
     }
@@ -135,6 +154,15 @@ export default class ChessBoard extends Component {
                 </RankCoord>
             );
         });
+    }
+
+    renderPlayerTurnIndicator() {
+        return (
+            <TurnIndicator
+                cellsSize={this.props.cellsSize}
+                blackTurn={this._chess.turn() === 'b'}
+            />
+        );
     }
 
 }

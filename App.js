@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components/native';
+
 import ChessBoard from './components/chessboard';
 
 const TopPanel = styled.View`
@@ -22,6 +23,7 @@ const ButtonText = styled.Text`
 `;
 
 export default class App extends Component {
+
   render() {
     return (
       <TopPanel>
