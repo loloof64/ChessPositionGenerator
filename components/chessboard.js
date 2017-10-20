@@ -65,13 +65,13 @@ const TurnIndicator = styled.View.attrs({
     top: ${props => props.location};
 `;
 
-@observer
 class Piece extends Component {
+
     constructor(props) {
         super(props);
         this.size = parseInt(props.size || 20);
-        this.x = parseInt(props.x || 0); //todo make observable
-        this.y = parseInt(props.y || 0); //todo make observable
+        this.x = parseInt(props.x || 0);
+        this.y = parseInt(props.y || 0);
 
         console.log(`Props is {x: ${props.x}, y: ${props.y}, size: ${props.size}}`)
     }
@@ -93,10 +93,11 @@ class Piece extends Component {
 @observer
 export default class ChessBoard extends Component {
 
-    @observable _chess = new Chess();
+    @observable _chess;
 
     constructor(props) {
         super(props);
+        this._chess = new Chess(this.props.fen);
     }
 
     render() {
