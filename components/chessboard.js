@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
+import { Image } from 'react-native';
 import styled from 'styled-components/native';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import _ from 'underscore';
 import { Chess } from 'chess.js';
+import { pl, pd, nl, nd, bl, bd, rl, rd, ql, qd, kl, kd } from './chess_tiles';
 
 const Zone = styled.View.attrs({
     cellsSize: props => parseInt(props.cellsSize) || 20,
@@ -64,11 +66,37 @@ const TurnIndicator = styled.View.attrs({
 `;
 
 @observer
+class Piece extends Component {
+    constructor(props) {
+        super(props);
+        this.size = parseInt(props.size || 20);
+        this.x = parseInt(props.x || 0); //todo make observable
+        this.y = parseInt(props.y || 0); //todo make observable
+
+        console.log(`Props is {x: ${props.x}, y: ${props.y}, size: ${props.size}}`)
+    }
+
+    render() {
+        return <Image
+            style={{
+                position: 'absolute',
+                width: this.size,
+                height: this.size,
+                left: this.x,
+                top: this.y,
+            }}
+            source={{ uri: this.props.sourceString }}
+        />
+    }
+}
+
+@observer
 export default class ChessBoard extends Component {
+
+    @observable _chess = new Chess();
 
     constructor(props) {
         super(props);
-        this._chess = Chess('K1k5/8/8/8/8/8/8/8 w - - 0 1');
     }
 
     render() {
@@ -80,6 +108,7 @@ export default class ChessBoard extends Component {
                 {this.renderRankCoords(true)}
                 {this.renderRankCoords(false)}
                 {this.renderPlayerTurnIndicator()}
+                {this.renderPieces()}
             </Zone>
         )
     }
@@ -163,6 +192,42 @@ export default class ChessBoard extends Component {
                 blackTurn={this._chess.turn() === 'b'}
             />
         );
+    }
+
+    renderPieces() {
+        const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+        const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
+
+        return _.map(ranks, (currRank, currRankIndex) => {
+            return _.map(files, (currFile, currFileIndex) => {
+                const cellStr = `${currFile}${currRank}`
+                let imageSource;
+                let piece = this._chess.get(cellStr);
+
+                if (piece) {
+                    const randomKey = parseInt(Math.random() * 1000000000).toString();
+                    switch (piece.type) {
+                        case 'p': imageSource = piece.color === 'b' ? pd : pl; break;
+                        case 'n': imageSource = piece.color === 'b' ? nd : nl; break;
+                        case 'b': imageSource = piece.color === 'b' ? bd : bl; break;
+                        case 'r': imageSource = piece.color === 'b' ? rd : rl; break;
+                        case 'q': imageSource = piece.color === 'b' ? qd : ql; break;
+                        case 'k': imageSource = piece.color === 'b' ? kd : kl; break;
+                    }
+
+                    return (
+                        <Piece
+                            key={randomKey}
+                            size={this.props.cellsSize}
+                            x={this.props.cellsSize * (this.props.reversed ? 7.5 - currFileIndex : currFileIndex + 0.5)}
+                            y={this.props.cellsSize * (this.props.reversed ? currRankIndex + 0.5 : 7.5 - currRankIndex)}
+                            sourceString={imageSource}
+                        />
+                    );
+                }
+
+            });
+        });
     }
 
 }
