@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Image } from 'react-native';
+import { Image, PanResponder, Animated } from 'react-native';
 import styled from 'styled-components/native';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
@@ -65,19 +65,31 @@ const TurnIndicator = styled.View.attrs({
     top: ${props => props.location};
 `;
 
+@observer
 class Piece extends Component {
+
+
+    @observable pan;
 
     constructor(props) {
         super(props);
         this.size = parseInt(props.size || 20);
         this.x = parseInt(props.x || 0);
         this.y = parseInt(props.y || 0);
-
-        console.log(`Props is {x: ${props.x}, y: ${props.y}, size: ${props.size}}`)
+        this.pan = new Animated.ValueXY();
+        this.panResponder = PanResponder.create({
+            onStartShouldSetPanResponder: () => true,
+            onPanResponderMove: Animated.event([null, {
+                dx: this.pan.x,
+                dy: this.pan.y
+            }]),
+            onPanResponderRelease: (e, gesture) => { }
+        });
     }
 
     render() {
-        return <Image
+        return <Animated.Image
+            {...this.panResponder.panHandlers}
             style={{
                 position: 'absolute',
                 width: this.size,
