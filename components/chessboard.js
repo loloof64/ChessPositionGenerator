@@ -16,6 +16,8 @@ const Zone = styled.View.attrs({
     height: ${props => props.size};
 `;
 
+const AnimatedZone = Animated.createAnimatedComponent(Zone);
+
 const Cell = styled.View.attrs({
     size: props => parseInt(props.cellsSize) || 20,
 }) `
@@ -68,28 +70,15 @@ const TurnIndicator = styled.View.attrs({
 @observer
 class Piece extends Component {
 
-
-    @observable pan;
-
     constructor(props) {
         super(props);
         this.size = parseInt(props.size || 20);
         this.x = parseInt(props.x || 0);
         this.y = parseInt(props.y || 0);
-        this.pan = new Animated.ValueXY();
-        this.panResponder = PanResponder.create({
-            onStartShouldSetPanResponder: () => true,
-            onPanResponderMove: Animated.event([null, {
-                dx: this.pan.x,
-                dy: this.pan.y
-            }]),
-            onPanResponderRelease: (e, gesture) => { }
-        });
     }
 
     render() {
-        return <Animated.Image
-            {...this.panResponder.panHandlers}
+        return <Image
             style={{
                 position: 'absolute',
                 width: this.size,
@@ -106,15 +95,28 @@ class Piece extends Component {
 export default class ChessBoard extends Component {
 
     @observable _chess;
+    @observable _position;
 
     constructor(props) {
         super(props);
         this._chess = new Chess(this.props.fen);
+        this._position = new Animated.ValueXY();
+        this._panResponder = PanResponder.create({
+            onStartShouldSetPanResponder: () => true,
+            onPanResponderMove: (event, gesture) => {
+                this._position.setValue({ x: gesture.dx, y: gesture.dy });
+            },
+            onPanResponderRelease: (e, gesture) => { }
+        });
     }
 
     render() {
         return (
-            <Zone cellsSize={this.props.cellsSize}>
+            <AnimatedZone
+                {...this._panResponder.panHandlers}
+                style={this._position.getLayout()}
+                cellsSize={this.props.cellsSize}
+            >
                 {this.renderAllRanks()}
                 {this.renderFileCoords(true)}
                 {this.renderFileCoords(false)}
@@ -122,7 +124,7 @@ export default class ChessBoard extends Component {
                 {this.renderRankCoords(false)}
                 {this.renderPlayerTurnIndicator()}
                 {this.renderPieces()}
-            </Zone>
+            </AnimatedZone>
         )
     }
 

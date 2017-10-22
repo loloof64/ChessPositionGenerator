@@ -36,7 +36,7 @@ export default class App extends Component {
   render() {
     return (
       <TopPanel>
-        <ChessBoard cellsSize={this.cellsSize} />
+        <ChessBoard cellsSize={this.cellsSize} reversed />
       </TopPanel>
     );
   }
