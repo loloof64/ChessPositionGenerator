@@ -91,7 +91,26 @@ class Piece extends Component {
         });
         this._position.setValue({ x: this.x, y: this.y });
         this._panResponder = PanResponder.create({
-            onStartShouldSetPanResponder: () => true,
+            onStartShouldSetPanResponder: (event, gestureState) => {
+                const nativeEvent = event.nativeEvent;
+
+                let origFile = parseInt((nativeEvent.pageX - this.props.parentX - this.size * 0.5) / this.size);
+                let origRank = 7 - parseInt((nativeEvent.pageY - this.props.parentY - this.size * 0.5) / this.size);
+                if (this.props.reversed) {
+                    origFile = 7 - origFile;
+                    origRank = 7 - origRank;
+                }
+
+                //////////////////////////////////
+                console.log(`${origFile} ${origRank}`)
+                ///////////////////////////////////
+
+                this._movedPiece = {
+                    file: origFile,
+                    rank: origRank,
+                }
+                return true;
+            },
             onPanResponderGrant: (event, gestureState) => {
                 this._position.setOffset({ x: this._position.x._value, y: this._position.y._value });
             },
@@ -99,6 +118,7 @@ class Piece extends Component {
                 this._position.setValue({ x: gesture.dx, y: gesture.dy });
             },
             onPanResponderRelease: (e, gesture) => {
+                this._movedPiece = undefined;
                 this._position.flattenOffset()
             }
         });
@@ -125,14 +145,23 @@ export default class ChessBoard extends Component {
     @observable _chess;
     @observable _position;
 
+    @observable _x;
+    @observable _y;
+
     constructor(props) {
         super(props);
         this._chess = new Chess(this.props.fen);
     }
 
+    layoutCallBack(event) {
+        this._x = event.nativeEvent.layout.x;
+        this._y = event.nativeEvent.layout.y;
+    }
+
     render() {
         return (
             <Zone
+                onLayout={this.layoutCallBack.bind(this)}
                 cellsSize={this.props.cellsSize}
             >
                 {this.renderAllRanks()}
@@ -254,6 +283,9 @@ export default class ChessBoard extends Component {
                             size={this.props.cellsSize}
                             x={this.props.cellsSize * (this.props.reversed ? 7.5 - currFileIndex : currFileIndex + 0.5)}
                             y={this.props.cellsSize * (this.props.reversed ? currRankIndex + 0.5 : 7.5 - currRankIndex)}
+                            parentX={this._x}
+                            parentY={this._y}
+                            reversed={this.props.reversed}
                             sourceString={imageSource}
                         />
                     );
