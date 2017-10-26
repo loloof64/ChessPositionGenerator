@@ -16,8 +16,6 @@ const Zone = styled.View.attrs({
     height: ${props => props.size};
 `;
 
-const AnimatedZone = Animated.createAnimatedComponent(Zone);
-
 const Cell = styled.View.attrs({
     size: props => parseInt(props.cellsSize) || 20,
 }) `
@@ -67,6 +65,8 @@ const TurnIndicator = styled.View.attrs({
     top: ${props => props.location};
 `;
 
+const AnimatedImage = Animated.createAnimatedComponent(Image);
+
 @observer
 class Piece extends Component {
 
@@ -75,17 +75,30 @@ class Piece extends Component {
         this.size = parseInt(props.size || 20);
         this.x = parseInt(props.x || 0);
         this.y = parseInt(props.y || 0);
+        this._position = new Animated.ValueXY({ x: this.x, y: this.y });
+        this._panResponder = PanResponder.create({
+            onStartShouldSetPanResponder: () => true,
+            onPanResponderGrant: (event, gestureState) => {
+                this._position.setOffset({ x: this._position.x._value, y: this._position.y._value });
+            },
+            onPanResponderMove: (event, gesture) => {
+                this._position.setValue({ x: gesture.dx, y: gesture.dy });
+            },
+            onPanResponderRelease: (e, gesture) => {
+                this._position.flattenOffset()
+            }
+        });
     }
 
     render() {
-        return <Image
+        return <AnimatedImage
             style={{
                 position: 'absolute',
                 width: this.size,
                 height: this.size,
-                left: this.x,
-                top: this.y,
+                ...this._position.getLayout()
             }}
+            {...this._panResponder.panHandlers }
             source={{ uri: this.props.sourceString }}
         />
     }
@@ -100,21 +113,11 @@ export default class ChessBoard extends Component {
     constructor(props) {
         super(props);
         this._chess = new Chess(this.props.fen);
-        this._position = new Animated.ValueXY();
-        this._panResponder = PanResponder.create({
-            onStartShouldSetPanResponder: () => true,
-            onPanResponderMove: (event, gesture) => {
-                this._position.setValue({ x: gesture.dx, y: gesture.dy });
-            },
-            onPanResponderRelease: (e, gesture) => { }
-        });
     }
 
     render() {
         return (
-            <AnimatedZone
-                {...this._panResponder.panHandlers}
-                style={this._position.getLayout()}
+            <Zone
                 cellsSize={this.props.cellsSize}
             >
                 {this.renderAllRanks()}
@@ -124,7 +127,7 @@ export default class ChessBoard extends Component {
                 {this.renderRankCoords(false)}
                 {this.renderPlayerTurnIndicator()}
                 {this.renderPieces()}
-            </AnimatedZone>
+            </Zone>
         )
     }
 
