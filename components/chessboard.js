@@ -75,7 +75,21 @@ class Piece extends Component {
         this.size = parseInt(props.size || 20);
         this.x = parseInt(props.x || 0);
         this.y = parseInt(props.y || 0);
-        this._position = new Animated.ValueXY({ x: this.x, y: this.y });
+        this.minXY = this.size * (0.5);
+        this.maxXY = this.size * (7.5);
+        this.midXY = (this.minXY + this.maxXY) / 2;
+        this._position = new Animated.ValueXY();
+        this._constrainedX = this._position.x.interpolate({
+            inputRange: [this.minXY, this.midXY, this.maxXY],
+            outputRange: [this.minXY, this.midXY, this.maxXY],
+            extrapolate: 'clamp',
+        });
+        this._constrainedY = this._position.y.interpolate({
+            inputRange: [this.minXY, this.midXY, this.maxXY],
+            outputRange: [this.minXY, this.midXY, this.maxXY],
+            extrapolate: 'clamp',
+        });
+        this._position.setValue({ x: this.x, y: this.y });
         this._panResponder = PanResponder.create({
             onStartShouldSetPanResponder: () => true,
             onPanResponderGrant: (event, gestureState) => {
@@ -96,7 +110,8 @@ class Piece extends Component {
                 position: 'absolute',
                 width: this.size,
                 height: this.size,
-                ...this._position.getLayout()
+                left: this._constrainedX,
+                top: this._constrainedY
             }}
             {...this._panResponder.panHandlers }
             source={{ uri: this.props.sourceString }}
