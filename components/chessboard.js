@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Image, PanResponder, Animated } from 'react-native';
+import { Image, PanResponder, Animated, Easing } from 'react-native';
 import styled from 'styled-components/native';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
@@ -136,6 +136,22 @@ class Piece extends Component {
                 if (moveSuccess) {
                     this.props.forceBoardRefresh();
                 }
+                else {
+                    const origX = parseInt(this.size *
+                        (this.props.reversed ? 7.5 - this._movedPiece.origFile : this._movedPiece.origFile + 0.5));
+                    const origY = parseInt(this.size *
+                        (this.props.reversed ? 0.5 + this._movedPiece.origRank : 7.5 - this._movedPiece.origRank));
+
+                    Animated.timing(
+                        this._position,
+                        {
+                            toValue: { x: origX, y: origY },
+                            duration: 400,
+                            delay: 0,
+                            easing: Easing.linear
+                        }
+                    ).start();
+                }
 
                 this._movedPiece = undefined;
                 this._position.flattenOffset()
@@ -174,8 +190,8 @@ export default class ChessBoard extends Component {
     _chess;
     _position;
 
-    _x;
-    _y;
+    @observable _x;
+    @observable _y;
 
     @observable _hiddenValue; // in order to force component refresh
 
