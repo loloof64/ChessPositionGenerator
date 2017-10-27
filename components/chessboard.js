@@ -16,6 +16,15 @@ const Zone = styled.View.attrs({
     height: ${props => props.size};
 `;
 
+const HiddenZone = styled.View`
+    background-color: #00000000;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: ${props => props.value};
+    height: ${props => props.value};
+`;
+
 const Cell = styled.View.attrs({
     size: props => parseInt(props.cellsSize) || 20,
 }) `
@@ -94,20 +103,14 @@ class Piece extends Component {
             onStartShouldSetPanResponder: (event, gestureState) => {
                 const nativeEvent = event.nativeEvent;
 
-                let origFile = parseInt((nativeEvent.pageX - this.props.parentX - this.size * 0.5) / this.size);
-                let origRank = 7 - parseInt((nativeEvent.pageY - this.props.parentY - this.size * 0.5) / this.size);
-                if (this.props.reversed) {
-                    origFile = 7 - origFile;
-                    origRank = 7 - origRank;
-                }
-
-                //////////////////////////////////
-                console.log(`${origFile} ${origRank}`)
-                ///////////////////////////////////
+                const [origFile, origRank] = this.computeClickedCellCoordinates({
+                    x: nativeEvent.pageX,
+                    y: nativeEvent.pageY,
+                });
 
                 this._movedPiece = {
-                    file: origFile,
-                    rank: origRank,
+                    origFile,
+                    origRank,
                 }
                 return true;
             },
@@ -117,11 +120,37 @@ class Piece extends Component {
             onPanResponderMove: (event, gesture) => {
                 this._position.setValue({ x: gesture.dx, y: gesture.dy });
             },
-            onPanResponderRelease: (e, gesture) => {
+            onPanResponderRelease: (event, gesture) => {
+                const nativeEvent = event.nativeEvent;
+
+                const [endFile, endRank] = this.computeClickedCellCoordinates({
+                    x: nativeEvent.pageX,
+                    y: nativeEvent.pageY,
+                });
+
+                const moveSuccess = this.props.doMove({
+                    ...this._movedPiece,
+                    endFile, endRank
+                });
+
+                if (moveSuccess) {
+                    this.props.forceBoardRefresh();
+                }
+
                 this._movedPiece = undefined;
                 this._position.flattenOffset()
             }
         });
+    }
+
+    computeClickedCellCoordinates(eventPage) {
+        let file = parseInt((eventPage.x - this.props.parentX - this.size * 0.5) / this.size);
+        let rank = 7 - parseInt((eventPage.y - this.props.parentY - this.size * 0.5) / this.size);
+        if (this.props.reversed) {
+            file = 7 - file;
+            rank = 7 - rank;
+        }
+        return [file, rank];
     }
 
     render() {
@@ -142,20 +171,27 @@ class Piece extends Component {
 @observer
 export default class ChessBoard extends Component {
 
-    @observable _chess;
-    @observable _position;
+    _chess;
+    _position;
 
-    @observable _x;
-    @observable _y;
+    _x;
+    _y;
+
+    @observable _hiddenValue; // in order to force component refresh
 
     constructor(props) {
         super(props);
         this._chess = new Chess(this.props.fen);
+        this._hiddenValue = 0;
     }
 
     layoutCallBack(event) {
         this._x = event.nativeEvent.layout.x;
         this._y = event.nativeEvent.layout.y;
+    }
+
+    forceRefresh() {
+        this._hiddenValue += 10;
     }
 
     render() {
@@ -171,8 +207,16 @@ export default class ChessBoard extends Component {
                 {this.renderRankCoords(false)}
                 {this.renderPlayerTurnIndicator()}
                 {this.renderPieces()}
+                <HiddenZone value={this._hiddenValue} />
             </Zone>
         )
+    }
+
+    doMove(moveCoords) {
+        const startCell = `${String.fromCharCode(97 + moveCoords.origFile)}${moveCoords.origRank + 1}`;
+        const endCell = `${String.fromCharCode(97 + moveCoords.endFile)}${moveCoords.endRank + 1}`;
+
+        return this._chess.move({ from: startCell, to: endCell });
     }
 
     renderAllRanks() {
@@ -287,6 +331,8 @@ export default class ChessBoard extends Component {
                             parentY={this._y}
                             reversed={this.props.reversed}
                             sourceString={imageSource}
+                            doMove={this.doMove.bind(this)}
+                            forceBoardRefresh={this.forceRefresh.bind(this)}
                         />
                     );
                 }
