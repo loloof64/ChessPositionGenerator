@@ -142,6 +142,14 @@ class Piece extends Component {
                     const origY = parseInt(this.size *
                         (this.props.reversed ? 0.5 + this._movedPiece.origRank : 7.5 - this._movedPiece.origRank));
 
+
+                    this._position.flattenOffset();
+
+                    // Act as if we have released from the centre of where the piece appears
+                    // on screen, rather than potentially outside the constrained area
+                    // (Thanks to Rob Hogan on StackOverflow)
+                    this._position.setValue({ x: this._constrainedX.__getValue(), y: this._constrainedY.__getValue() });
+
                     Animated.timing(
                         this._position,
                         {
@@ -154,7 +162,6 @@ class Piece extends Component {
                 }
 
                 this._movedPiece = undefined;
-                this._position.flattenOffset()
             }
         });
     }
