@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Image, PanResponder, Animated, Easing } from 'react-native';
+import { Image, PanResponder, Animated, Easing, Dimensions } from 'react-native';
 import styled from 'styled-components/native';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
@@ -108,19 +108,10 @@ class Piece extends Component {
                     y: nativeEvent.pageY,
                 });
 
-                ////////////////////////////////////
-                console.log(`Origin is : (${origFile}, ${origRank})`)
-                console.log(`Absolute Origin is : (${nativeEvent.pageX}, ${nativeEvent.pageY})`)
-                //////////////////////////////////////////
-
                 this._movedPiece = {
                     origFile,
                     origRank,
                 }
-
-                ////////////////////////
-                console.log(`Moved piece is (${this._movedPiece.origFile}, ${this._movedPiece.origRank})`)
-                //////////////////////////
 
                 return true;
             },
@@ -137,13 +128,6 @@ class Piece extends Component {
                     x: nativeEvent.pageX,
                     y: nativeEvent.pageY,
                 });
-
-                ////////////////////////////////////
-                console.log(`End is : (${endFile}, ${endRank})`)
-                console.log(`Absolute End is : (${nativeEvent.pageX}, ${nativeEvent.pageY})`)
-                console.log(`Parent position : (${this.props.parentX}, ${this.props.parentY})`)
-                console.log(`cells size : ${this.props.size}`)
-                //////////////////////////////////////////
 
                 const moveSuccess = this.props.doMove({
                     ...this._movedPiece,
@@ -223,13 +207,14 @@ export default class ChessBoard extends Component {
         super(props);
         this._chess = new Chess(this.props.fen);
         this._hiddenValue = 0;
+        Dimensions.addEventListener('change', this.onLayout.bind(this)); // handling rotations
     }
 
     forceRefresh() {
         this._hiddenValue += 10;
     }
 
-    componentDidMount() {
+    onLayout() {
         setTimeout(() => this.chessboardZone.measure((frameX, frameY, width, height, pageX, pageY) => {
             this._x = pageX;
             this._y = pageY;
@@ -239,6 +224,7 @@ export default class ChessBoard extends Component {
     render() {
         return (
             <Zone
+                onLayout={this.onLayout.bind(this)}
                 innerRef={(element) => this.chessboardZone = element}
                 cellsSize={this.props.cellsSize}
             >
