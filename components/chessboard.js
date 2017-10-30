@@ -108,10 +108,20 @@ class Piece extends Component {
                     y: nativeEvent.pageY,
                 });
 
+                ////////////////////////////////////
+                console.log(`Origin is : (${origFile}, ${origRank})`)
+                console.log(`Absolute Origin is : (${nativeEvent.pageX}, ${nativeEvent.pageY})`)
+                //////////////////////////////////////////
+
                 this._movedPiece = {
                     origFile,
                     origRank,
                 }
+
+                ////////////////////////
+                console.log(`Moved piece is (${this._movedPiece.origFile}, ${this._movedPiece.origRank})`)
+                //////////////////////////
+
                 return true;
             },
             onPanResponderGrant: (event, gestureState) => {
@@ -127,6 +137,13 @@ class Piece extends Component {
                     x: nativeEvent.pageX,
                     y: nativeEvent.pageY,
                 });
+
+                ////////////////////////////////////
+                console.log(`End is : (${endFile}, ${endRank})`)
+                console.log(`Absolute End is : (${nativeEvent.pageX}, ${nativeEvent.pageY})`)
+                console.log(`Parent position : (${this.props.parentX}, ${this.props.parentY})`)
+                console.log(`cells size : ${this.props.size}`)
+                //////////////////////////////////////////
 
                 const moveSuccess = this.props.doMove({
                     ...this._movedPiece,
@@ -208,19 +225,21 @@ export default class ChessBoard extends Component {
         this._hiddenValue = 0;
     }
 
-    layoutCallBack(event) {
-        this._x = event.nativeEvent.layout.x;
-        this._y = event.nativeEvent.layout.y;
-    }
-
     forceRefresh() {
         this._hiddenValue += 10;
+    }
+
+    componentDidMount() {
+        setTimeout(() => this.chessboardZone.measure((frameX, frameY, width, height, pageX, pageY) => {
+            this._x = pageX;
+            this._y = pageY;
+        }, 10));
     }
 
     render() {
         return (
             <Zone
-                onLayout={this.layoutCallBack.bind(this)}
+                innerRef={(element) => this.chessboardZone = element}
                 cellsSize={this.props.cellsSize}
             >
                 {this.renderAllRanks()}
