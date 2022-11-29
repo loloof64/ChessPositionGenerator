@@ -1,0 +1,7 @@
+{
+  "buttons_ok": "Confirm",
+  "buttons_cancel": "Cancel",
+  "gamePage_title": "Game page",
+  "gamePage_newGame_title": "Start a new game ?",
+  "gamePage_newGame_message": "Do you want to leave current game and start a new one ?"
+} 

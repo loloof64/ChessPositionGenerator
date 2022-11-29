@@ -3,7 +3,7 @@ import 'package:chess_vectors_flutter/chess_vectors_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_chess_board/models/board_arrow.dart';
 import 'package:simple_chess_board/simple_chess_board.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../logic/utils.dart';
 
 const emptyBoardFen = '8/8/8/8/8/8/8/8 w - - 0 1';
@@ -69,16 +69,17 @@ class _GamePageState extends State<GamePage> {
     final bool gameStarted = _gameLogic.fen != emptyBoardFen;
     if (gameStarted) {
       final confirmationDialog = AlertDialog(
-        title: const Text("Start a new game ?"),
-        content: const Text(
-            "Do you want to leave current game and start a new one ?"),
+        title: Text(AppLocalizations.of(context)!.gamePage_newGame_title),
+        content: Text(
+          AppLocalizations.of(context)!.gamePage_newGame_message,
+        ),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
             child: Text(
-              "Cancel",
+              AppLocalizations.of(context)!.buttons_cancel,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.error,
               ),
@@ -90,7 +91,7 @@ class _GamePageState extends State<GamePage> {
               _doStartNewGame();
             },
             child: Text(
-              "Confirm",
+              AppLocalizations.of(context)!.buttons_ok,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.primary,
               ),
@@ -193,7 +194,9 @@ class _GamePageState extends State<GamePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Game page"),
+        title: Text(
+          AppLocalizations.of(context)!.gamePage_title,
+        ),
         actions: [
           IconButton(
             onPressed: _purposeStartNewGame,
