@@ -36,6 +36,12 @@ class Cell extends Equatable {
 
   @override
   bool get stringify => true;
+
+  String getUciString() {
+    final fileStr = String.fromCharCode('a'.codeUnitAt(0) + file.index);
+    final rankStr = String.fromCharCode('1'.codeUnitAt(0) + rank.index);
+    return '$fileStr$rankStr';
+  }
 }
 
 class Move extends Equatable {
@@ -54,12 +60,12 @@ class Move extends Equatable {
   List<Object?> get props => [from, to];
 }
 
-class HistoryNode {
-  String caption;
-  String? fen;
-  Move? move;
+class HistoryNode extends Equatable {
+  final String caption;
+  final String? fen;
+  final Move? move;
 
-  HistoryNode({
+  const HistoryNode({
     required this.caption,
     this.fen,
     this.move,
@@ -67,10 +73,14 @@ class HistoryNode {
 
   @override
   String toString() => 'HistoryNode(caption: $caption, fen: $fen, move: $move)';
+
+  @override
+  List<Object?> get props => [caption, fen, move];
 }
 
 class ChessHistory extends StatelessWidget {
   final double fontSize;
+  final int? selectedNodeIndex;
 
   final List<HistoryNode> nodesDescriptions;
   final ScrollController scrollController;
@@ -86,6 +96,7 @@ class ChessHistory extends StatelessWidget {
 
   const ChessHistory({
     Key? key,
+    required this.selectedNodeIndex,
     required this.fontSize,
     required this.nodesDescriptions,
     required this.scrollController,
@@ -106,16 +117,29 @@ class ChessHistory extends StatelessWidget {
 
     nodesDescriptions.asMap().forEach((index, currentNode) {
       if (currentNode.fen != null) {
-        nodes.add(TextButton(
-          onPressed: () => onHistoryMoveRequested(
-            historyMove: currentNode.move!,
-            selectedHistoryNodeIndex: index,
-          ),
-          child: Text(
-            currentNode.caption,
-            style: textStyle,
-          ),
-        ));
+        final nodeSelected = index == selectedNodeIndex;
+        final nodeButton = nodeSelected
+            ? ElevatedButton(
+                onPressed: () => onHistoryMoveRequested(
+                  historyMove: currentNode.move!,
+                  selectedHistoryNodeIndex: index,
+                ),
+                child: Text(
+                  currentNode.caption,
+                  style: textStyle,
+                ),
+              )
+            : TextButton(
+                onPressed: () => onHistoryMoveRequested(
+                  historyMove: currentNode.move!,
+                  selectedHistoryNodeIndex: index,
+                ),
+                child: Text(
+                  currentNode.caption,
+                  style: textStyle,
+                ),
+              );
+        nodes.add(nodeButton);
       } else {
         nodes.add(
           Text(

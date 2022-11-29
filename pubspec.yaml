@@ -43,6 +43,8 @@ dependencies:
   chess: ^0.8.0
   chess_vectors_flutter: ^1.0.18
   equatable: ^2.0.5
+  collection: ^1.16.0
+  tuple: ^2.0.1
 
 
   # The following adds the Cupertino Icons font to your application.

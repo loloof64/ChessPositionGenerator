@@ -1,12 +1,11 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
-
 import 'package:chess/chess.dart' as chess;
 import 'package:chess_vectors_flutter/chess_vectors_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:simple_chess_board/models/board_arrow.dart';
 import 'package:simple_chess_board/simple_chess_board.dart';
+import 'package:collection/collection.dart';
+import 'package:tuple/tuple.dart';
 
 import 'package:chess_position_generator/components/history/history.dart';
 
@@ -23,14 +22,16 @@ class GamePage extends StatefulWidget {
 
 class _GamePageState extends State<GamePage> {
   chess.Chess _gameLogic = chess.Chess.fromFEN(emptyBoardFen);
+  final _startPosition = chess.Chess.DEFAULT_POSITION;
   BoardColor _orientation = BoardColor.white;
   final PlayerType _whitePlayerType = PlayerType.human;
   final PlayerType _blackPlayerType = PlayerType.human;
   bool _gameStart = true;
   bool _gameInProgress = false;
   BoardArrow? _lastMoveToHighlight;
-  List<HistoryNode> _historyNodesDescriptions = [];
+  List<HistoryNode> _historyhistoryNodesDescriptions = [];
   final ScrollController _historyScrollController = ScrollController();
+  int? _selectedHistoryItemIndex = -1;
 
   void _onMove({required ShortMove move}) {
     final moveHasBeenMade = _gameLogic.move({
@@ -49,7 +50,7 @@ class _GamePageState extends State<GamePage> {
       if (!whiteMove && !_gameStart) {
         final moveNumberCaption = "${_gameLogic.fen.split(' ')[5]}.";
         setState(() {
-          _historyNodesDescriptions
+          _historyhistoryNodesDescriptions
               .add(HistoryNode(caption: moveNumberCaption));
         });
       }
@@ -63,8 +64,16 @@ class _GamePageState extends State<GamePage> {
       final fan = san.toFan(whiteMove: !whiteMove);
 
       setState(() {
-        _historyNodesDescriptions
-            .add(HistoryNode(caption: fan, fen: _gameLogic.fen));
+        _historyhistoryNodesDescriptions.add(
+          HistoryNode(
+            caption: fan,
+            fen: _gameLogic.fen,
+            move: Move(
+              from: Cell.fromString(move.from),
+              to: Cell.fromString(move.to),
+            ),
+          ),
+        );
         _lastMoveToHighlight = BoardArrow(
           from: move.from,
           to: move.to,
@@ -123,14 +132,16 @@ class _GamePageState extends State<GamePage> {
 
   void _doStartNewGame() {
     setState(() {
-      _gameLogic = chess.Chess();
+      _gameLogic = chess.Chess.fromFEN(_startPosition);
     });
     final moveNumberCaption = "${_gameLogic.fen.split(' ')[5]}.";
     setState(() {
       _gameStart = true;
       _lastMoveToHighlight = null;
-      _historyNodesDescriptions = [];
-      _historyNodesDescriptions.add(HistoryNode(caption: moveNumberCaption));
+      _historyhistoryNodesDescriptions = [];
+      _historyhistoryNodesDescriptions
+          .add(HistoryNode(caption: moveNumberCaption));
+      _selectedHistoryItemIndex = -1;
       _gameInProgress = true;
     });
   }
@@ -169,6 +180,7 @@ class _GamePageState extends State<GamePage> {
           content: Text(snackMessage),
         ),
       );
+      _selectLastHistoryNode();
     }
   }
 
@@ -237,13 +249,103 @@ class _GamePageState extends State<GamePage> {
         });
   }
 
-  void _onGotoFirstHistoryNodeRequest() {}
+  void _selectFirstGamePosition() {
+    if (_gameInProgress) return;
+    setState(() {
+      _selectedHistoryItemIndex = null;
+      _lastMoveToHighlight = null;
+      _gameLogic = chess.Chess.fromFEN(_startPosition);
+    });
+  }
 
-  void _onGotoPreviousHistoryNodeRequest() {}
+  void _selectPreviousHistoryNode() {
+    if (_gameInProgress) return;
+    if (_selectedHistoryItemIndex == null) return;
+    /*
+    We test against value 2 because
+    value 0 is for the first move number
+    and value 1 is for the first move san
+    */
+    if (_selectedHistoryItemIndex! < 2) {
+      // selecting first game position
+      setState(() {
+        _selectedHistoryItemIndex = null;
+        _lastMoveToHighlight = null;
+        _gameLogic = chess.Chess.fromFEN(_startPosition);
+      });
+      return;
+    }
+    final previousNodeData = _historyhistoryNodesDescriptions
+        .mapIndexed((index, element) => Tuple2(index, element))
+        .where((element) => element.item2.fen != null)
+        .takeWhile((element) => element.item1 != _selectedHistoryItemIndex)
+        .lastOrNull;
+    if (previousNodeData == null) return;
 
-  void _onGotoNextHistoryNodeRequest() {}
+    final moveData = previousNodeData.item2.move!;
 
-  void _onGotoLastHistoryNodeRequest() {}
+    setState(() {
+      _selectedHistoryItemIndex = previousNodeData.item1;
+      _gameLogic = chess.Chess.fromFEN(previousNodeData.item2.fen!);
+      _lastMoveToHighlight = BoardArrow(
+        from: moveData.from.getUciString(),
+        to: moveData.to.getUciString(),
+        color: Colors.blueAccent,
+      );
+    });
+  }
+
+  void _selectNextHistoryNode() {
+    if (_gameInProgress) return;
+    if (_selectedHistoryItemIndex == null) {
+      // Move number and first move san, at least
+      if (_historyhistoryNodesDescriptions.length >= 2) {
+        setState(() {
+          // First move san
+          _selectedHistoryItemIndex = 1;
+        });
+      }
+      return;
+    }
+    final nextNodeData = _historyhistoryNodesDescriptions
+        .mapIndexed((index, element) => Tuple2(index, element))
+        .where((element) => element.item2.fen != null)
+        .skipWhile((element) => element.item1 != _selectedHistoryItemIndex)
+        .skip(1)
+        .firstOrNull;
+    if (nextNodeData == null) return;
+
+    final moveData = nextNodeData.item2.move!;
+    setState(() {
+      _selectedHistoryItemIndex = nextNodeData.item1;
+      _gameLogic = chess.Chess.fromFEN(nextNodeData.item2.fen!);
+      _lastMoveToHighlight = BoardArrow(
+        from: moveData.from.getUciString(),
+        to: moveData.to.getUciString(),
+        color: Colors.blueAccent,
+      );
+    });
+  }
+
+  void _selectLastHistoryNode() {
+    if (_gameInProgress) return;
+    final lastNodeData = _historyhistoryNodesDescriptions
+        .mapIndexed((index, element) => Tuple2(index, element))
+        .where((element) => element.item2.fen != null)
+        .lastOrNull;
+    if (lastNodeData == null) return;
+
+    final moveData = lastNodeData.item2.move!;
+    setState(() {
+      _selectedHistoryItemIndex = lastNodeData.item1;
+      _gameLogic = chess.Chess.fromFEN(lastNodeData.item2.fen!);
+      _lastMoveToHighlight = BoardArrow(
+        from: moveData.from.getUciString(),
+        to: moveData.to.getUciString(),
+        color: Colors.blueAccent,
+      );
+    });
+  }
 
   void _onHistoryMoveRequest(
       {required Move historyMove, required int? selectedHistoryNodeIndex}) {}
@@ -297,6 +399,7 @@ class _GamePageState extends State<GamePage> {
     setState(() {
       _gameInProgress = false;
     });
+    _selectLastHistoryNode();
   }
 
   @override
@@ -340,12 +443,13 @@ class _GamePageState extends State<GamePage> {
                 lastMoveToHighlight: _lastMoveToHighlight,
                 onPromote: _onPromote,
                 onMove: _onMove,
-                nodesDescriptions: _historyNodesDescriptions,
+                historySelectedNodeIndex: _selectedHistoryItemIndex,
+                historyNodesDescriptions: _historyhistoryNodesDescriptions,
                 historyScrollController: _historyScrollController,
-                requestGotoFirst: _onGotoFirstHistoryNodeRequest,
-                requestGotoPrevious: _onGotoPreviousHistoryNodeRequest,
-                requestGotoNext: _onGotoNextHistoryNodeRequest,
-                requestGotoLast: _onGotoLastHistoryNodeRequest,
+                requestGotoFirst: _selectFirstGamePosition,
+                requestGotoPrevious: _selectPreviousHistoryNode,
+                requestGotoNext: _selectNextHistoryNode,
+                requestGotoLast: _selectLastHistoryNode,
                 requestHistoryMove: _onHistoryMoveRequest,
               )
             : LandscapeWidget(
@@ -357,12 +461,13 @@ class _GamePageState extends State<GamePage> {
                 lastMoveToHighlight: _lastMoveToHighlight,
                 onPromote: _onPromote,
                 onMove: _onMove,
-                nodesDescriptions: _historyNodesDescriptions,
+                historySelectedNodeIndex: _selectedHistoryItemIndex,
+                historyNodesDescriptions: _historyhistoryNodesDescriptions,
                 historyScrollController: _historyScrollController,
-                requestGotoFirst: _onGotoFirstHistoryNodeRequest,
-                requestGotoPrevious: _onGotoPreviousHistoryNodeRequest,
-                requestGotoNext: _onGotoNextHistoryNodeRequest,
-                requestGotoLast: _onGotoLastHistoryNodeRequest,
+                requestGotoFirst: _selectFirstGamePosition,
+                requestGotoPrevious: _selectPreviousHistoryNode,
+                requestGotoNext: _selectNextHistoryNode,
+                requestGotoLast: _selectLastHistoryNode,
                 requestHistoryMove: _onHistoryMoveRequest,
               ),
       ),
@@ -380,7 +485,8 @@ class PortraitWidget extends StatelessWidget {
   final void Function({required ShortMove move}) onMove;
   final Future<PieceType?> Function() onPromote;
 
-  final List<HistoryNode> nodesDescriptions;
+  final int? historySelectedNodeIndex;
+  final List<HistoryNode> historyNodesDescriptions;
   final ScrollController historyScrollController;
   final void Function() requestGotoFirst;
   final void Function() requestGotoPrevious;
@@ -400,7 +506,8 @@ class PortraitWidget extends StatelessWidget {
     required this.lastMoveToHighlight,
     required this.onPromote,
     required this.onMove,
-    required this.nodesDescriptions,
+    required this.historySelectedNodeIndex,
+    required this.historyNodesDescriptions,
     required this.historyScrollController,
     required this.requestGotoFirst,
     required this.requestGotoPrevious,
@@ -434,7 +541,8 @@ class PortraitWidget extends StatelessWidget {
           child: LayoutBuilder(builder: (ctx2, constraints2) {
             return ChessHistory(
               fontSize: constraints2.biggest.height * 0.1,
-              nodesDescriptions: nodesDescriptions,
+              selectedNodeIndex: historySelectedNodeIndex,
+              nodesDescriptions: historyNodesDescriptions,
               scrollController: historyScrollController,
               requestGotoFirst: requestGotoFirst,
               requestGotoPrevious: requestGotoPrevious,
@@ -459,7 +567,8 @@ class LandscapeWidget extends StatelessWidget {
   final void Function({required ShortMove move}) onMove;
   final Future<PieceType?> Function() onPromote;
 
-  final List<HistoryNode> nodesDescriptions;
+  final int? historySelectedNodeIndex;
+  final List<HistoryNode> historyNodesDescriptions;
   final ScrollController historyScrollController;
   final void Function() requestGotoFirst;
   final void Function() requestGotoPrevious;
@@ -479,7 +588,8 @@ class LandscapeWidget extends StatelessWidget {
     required this.lastMoveToHighlight,
     required this.onPromote,
     required this.onMove,
-    required this.nodesDescriptions,
+    required this.historySelectedNodeIndex,
+    required this.historyNodesDescriptions,
     required this.historyScrollController,
     required this.requestGotoFirst,
     required this.requestGotoPrevious,
@@ -510,7 +620,8 @@ class LandscapeWidget extends StatelessWidget {
           child: LayoutBuilder(builder: (ctx2, constraints2) {
             return ChessHistory(
               fontSize: constraints2.biggest.height * 0.07,
-              nodesDescriptions: nodesDescriptions,
+              selectedNodeIndex: historySelectedNodeIndex,
+              nodesDescriptions: historyNodesDescriptions,
               scrollController: historyScrollController,
               requestGotoFirst: requestGotoFirst,
               requestGotoPrevious: requestGotoPrevious,
