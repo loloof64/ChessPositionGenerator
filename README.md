@@ -1,4 +1,4 @@
-# chess_position_generator
+# Chess Position Generator
 
 Generate a chess position from your criterias.
 
