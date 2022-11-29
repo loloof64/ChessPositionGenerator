@@ -1,4 +1,6 @@
 {
+    "white_side": "les Blancs",
+    "black_side": "les Noirs",
     "buttons_ok": "Confirmer",
     "buttons_cancel": "Annuler",
     "gamePage_title": "Page de jeu",
@@ -6,5 +8,11 @@
     "gamePage_newGame_message": "Souhaitez-vous commencer une nouvelle partie et quitter la partie actuelle ?",
     "gamePage_stopGame_title": "Interrompre la partie en cours ?",
     "gamePage_stopGame_message": "Souhaitez-vous interrompre la partie en cours ?",
-    "gamePage_gameStopped": "Partie interrompue."
+    "gamePage_gameStopped": "Partie interrompue.",
+    "gamePage_checkmate_white": "Les Blancs gagnent par échec et mat.",
+    "gamePage_checkmate_black": "Les Noirs gagnent par échec et mat.",
+    "gamePage_stalemate": "Pat.",
+    "gamePage_threeFoldRepetition": "Nulle par triple répétition.",
+    "gamePage_missingMaterial": "Nulle par insuffisance matérielle.",
+    "gamePage_fiftyMovesRule": "Nulle par la règle des 50 coups."
   } 

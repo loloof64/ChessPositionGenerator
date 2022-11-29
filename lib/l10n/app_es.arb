@@ -1,4 +1,6 @@
 {
+    "white_side": "los blancos",
+    "black_side": "los negros",
     "buttons_ok": "Confirmar",
     "buttons_cancel": "Cancelar",
     "gamePage_title": "Página del juego",
@@ -6,5 +8,11 @@
     "gamePage_newGame_message": "¿Quieres salir del juego actual y comenzar uno nuevo?",
     "gamePage_stopGame_title": "¿Detener el juego actual?",
     "gamePage_stopGame_message": "¿Quieres detener el juego actual?",
-    "gamePage_gameStopped": "Juego detenido."
+    "gamePage_gameStopped": "Juego detenido.",
+    "gamePage_checkmate_white": "Los blancos han ganado por jaque mate.",
+    "gamePage_checkmate_black": "Los negros han ganado por jaque mate.",
+    "gamePage_stalemate": "Ahogado.",
+    "gamePage_threeFoldRepetition": "Tablas por repetición triple.",
+    "gamePage_missingMaterial": "Tablas por material faltante.",
+    "gamePage_fiftyMovesRule": "Tablas según la regla de los 50 movimientos."
   } 

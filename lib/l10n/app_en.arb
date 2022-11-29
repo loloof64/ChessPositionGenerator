@@ -1,4 +1,6 @@
 {
+  "white_side": "whites",
+  "black_side": "blacks",
   "buttons_ok": "Confirm",
   "buttons_cancel": "Cancel",
   "gamePage_title": "Game page",
@@ -6,5 +8,11 @@
   "gamePage_newGame_message": "Do you want to leave current game and start a new one ?",
   "gamePage_stopGame_title": "Stop current game ?",
   "gamePage_stopGame_message": "Do you want to stop current game ?",
-  "gamePage_gameStopped": "Game stopped."
+  "gamePage_gameStopped": "Game stopped.",
+  "gamePage_checkmate_white": "Whites have won by checkmate.",
+  "gamePage_checkmate_black": "Blacks have won by checkmate.",
+  "gamePage_stalemate": "Stalemate.",
+  "gamePage_threeFoldRepetition": "Draw by three-fold repetition.",
+  "gamePage_missingMaterial": "Draw by missing material.",
+  "gamePage_fiftyMovesRule": "Draw by the 50 moves rule."
 } 

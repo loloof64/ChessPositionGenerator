@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
+
 import 'package:chess/chess.dart' as chess;
 import 'package:chess_vectors_flutter/chess_vectors_flutter.dart';
 import 'package:flutter/material.dart';
@@ -70,6 +72,8 @@ class _GamePageState extends State<GamePage> {
         );
         _gameStart = false;
       });
+
+      _handleGameEndedIfNeeded();
     }
   }
 
@@ -137,6 +141,35 @@ class _GamePageState extends State<GamePage> {
           ? BoardColor.black
           : BoardColor.white;
     });
+  }
+
+  void _handleGameEndedIfNeeded() {
+    String? snackMessage;
+    if (_gameLogic.in_checkmate) {
+      final whiteTurnBeforeMove = _gameLogic.turn == chess.Color.BLACK;
+      snackMessage = whiteTurnBeforeMove
+          ? AppLocalizations.of(context)!.gamePage_checkmate_white
+          : AppLocalizations.of(context)!.gamePage_checkmate_black;
+    } else if (_gameLogic.in_stalemate) {
+      snackMessage = AppLocalizations.of(context)!.gamePage_stalemate;
+    } else if (_gameLogic.in_threefold_repetition) {
+      snackMessage = AppLocalizations.of(context)!.gamePage_threeFoldRepetition;
+    } else if (_gameLogic.insufficient_material) {
+      snackMessage = AppLocalizations.of(context)!.gamePage_missingMaterial;
+    } else if (_gameLogic.in_draw) {
+      snackMessage = AppLocalizations.of(context)!.gamePage_fiftyMovesRule;
+    }
+
+    if (snackMessage != null) {
+      setState(() {
+        _gameInProgress = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(snackMessage),
+        ),
+      );
+    }
   }
 
   Future<PieceType?> _onPromote() {
