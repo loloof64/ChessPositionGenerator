@@ -25,6 +25,7 @@ class _GamePageState extends State<GamePage> {
   final PlayerType _whitePlayerType = PlayerType.human;
   final PlayerType _blackPlayerType = PlayerType.human;
   bool _gameStart = true;
+  bool _gameInProgress = false;
   BoardArrow? _lastMoveToHighlight;
   List<HistoryNode> _historyNodesDescriptions = [];
   final ScrollController _historyScrollController = ScrollController();
@@ -126,6 +127,7 @@ class _GamePageState extends State<GamePage> {
       _lastMoveToHighlight = null;
       _historyNodesDescriptions = [];
       _historyNodesDescriptions.add(HistoryNode(caption: moveNumberCaption));
+      _gameInProgress = true;
     });
   }
 
@@ -213,7 +215,56 @@ class _GamePageState extends State<GamePage> {
   void _onHistoryMoveRequest(
       {required Move historyMove, required int? selectedHistoryNodeIndex}) {}
 
-  void _onStopRequested() {}
+  void _onStopRequested() {
+    final noGameRunning =
+        (_gameLogic.fen == emptyBoardFen) || (_gameInProgress == false);
+    if (noGameRunning) return;
+
+    final confirmDialog = AlertDialog(
+      title: Text(AppLocalizations.of(context)!.gamePage_stopGame_title),
+      content: Text(AppLocalizations.of(context)!.gamePage_stopGame_message),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            AppLocalizations.of(context)!.buttons_cancel,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.error,
+            ),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            _doStopGame();
+          },
+          child: Text(
+            AppLocalizations.of(context)!.buttons_ok,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ),
+      ],
+    );
+    showDialog(
+        context: context,
+        builder: (ctx) {
+          return confirmDialog;
+        });
+  }
+
+  void _doStopGame() {
+    final snackBar = SnackBar(
+      content: Text(AppLocalizations.of(context)!.gamePage_gameStopped),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    setState(() {
+      _gameInProgress = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -248,6 +299,7 @@ class _GamePageState extends State<GamePage> {
       body: Center(
         child: isPortrait
             ? PortraitWidget(
+                gameInProgress: _gameInProgress,
                 positionFen: _gameLogic.fen,
                 boardOrientation: _orientation,
                 whitePlayerType: _whitePlayerType,
@@ -264,6 +316,7 @@ class _GamePageState extends State<GamePage> {
                 requestHistoryMove: _onHistoryMoveRequest,
               )
             : LandscapeWidget(
+                gameInProgress: _gameInProgress,
                 positionFen: _gameLogic.fen,
                 boardOrientation: _orientation,
                 whitePlayerType: _whitePlayerType,
@@ -285,6 +338,7 @@ class _GamePageState extends State<GamePage> {
 }
 
 class PortraitWidget extends StatelessWidget {
+  final bool gameInProgress;
   final String positionFen;
   final BoardColor boardOrientation;
   final PlayerType whitePlayerType;
@@ -305,6 +359,7 @@ class PortraitWidget extends StatelessWidget {
 
   const PortraitWidget({
     super.key,
+    required this.gameInProgress,
     required this.positionFen,
     required this.boardOrientation,
     required this.whitePlayerType,
@@ -331,8 +386,10 @@ class PortraitWidget extends StatelessWidget {
           child: SimpleChessBoard(
             fen: positionFen,
             orientation: boardOrientation,
-            whitePlayerType: whitePlayerType,
-            blackPlayerType: blackPlayerType,
+            whitePlayerType:
+                gameInProgress ? whitePlayerType : PlayerType.computer,
+            blackPlayerType:
+                gameInProgress ? blackPlayerType : PlayerType.computer,
             onMove: onMove,
             onPromote: onPromote,
             lastMoveToHighlight: lastMoveToHighlight,
@@ -360,6 +417,7 @@ class PortraitWidget extends StatelessWidget {
 }
 
 class LandscapeWidget extends StatelessWidget {
+  final bool gameInProgress;
   final String positionFen;
   final BoardColor boardOrientation;
   final PlayerType whitePlayerType;
@@ -380,6 +438,7 @@ class LandscapeWidget extends StatelessWidget {
 
   const LandscapeWidget({
     super.key,
+    required this.gameInProgress,
     required this.positionFen,
     required this.boardOrientation,
     required this.whitePlayerType,
@@ -405,8 +464,10 @@ class LandscapeWidget extends StatelessWidget {
         SimpleChessBoard(
           fen: positionFen,
           orientation: boardOrientation,
-          whitePlayerType: whitePlayerType,
-          blackPlayerType: blackPlayerType,
+          whitePlayerType:
+              gameInProgress ? whitePlayerType : PlayerType.computer,
+          blackPlayerType:
+              gameInProgress ? blackPlayerType : PlayerType.computer,
           onMove: onMove,
           onPromote: onPromote,
           lastMoveToHighlight: lastMoveToHighlight,

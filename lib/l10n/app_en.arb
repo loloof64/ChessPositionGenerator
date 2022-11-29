@@ -3,5 +3,8 @@
   "buttons_cancel": "Cancel",
   "gamePage_title": "Game page",
   "gamePage_newGame_title": "Start a new game ?",
-  "gamePage_newGame_message": "Do you want to leave current game and start a new one ?"
+  "gamePage_newGame_message": "Do you want to leave current game and start a new one ?",
+  "gamePage_stopGame_title": "Stop current game ?",
+  "gamePage_stopGame_message": "Do you want to stop current game ?",
+  "gamePage_gameStopped": "Game stopped."
 } 

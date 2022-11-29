@@ -3,5 +3,8 @@
     "buttons_cancel": "Annuler",
     "gamePage_title": "Page de jeu",
     "gamePage_newGame_title": "Commencer une nouvelle partie ?",
-    "gamePage_newGame_message": "Souhaitez-vous commencer une nouvelle partie et quitter la partie actuelle ?"
+    "gamePage_newGame_message": "Souhaitez-vous commencer une nouvelle partie et quitter la partie actuelle ?",
+    "gamePage_stopGame_title": "Interrompre la partie en cours ?",
+    "gamePage_stopGame_message": "Souhaitez-vous interrompre la partie en cours ?",
+    "gamePage_gameStopped": "Partie interrompue."
   } 
