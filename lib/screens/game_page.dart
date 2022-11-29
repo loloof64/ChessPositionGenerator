@@ -24,10 +24,9 @@ class _GamePageState extends State<GamePage> {
   BoardColor _orientation = BoardColor.white;
   final PlayerType _whitePlayerType = PlayerType.human;
   final PlayerType _blackPlayerType = PlayerType.human;
-  final List<String> _movesSans = [];
   bool _gameStart = true;
   BoardArrow? _lastMoveToHighlight;
-  final List<HistoryNode> _historyNodesDescriptions = [];
+  List<HistoryNode> _historyNodesDescriptions = [];
   final ScrollController _historyScrollController = ScrollController();
 
   void _onMove({required ShortMove move}) {
@@ -47,7 +46,8 @@ class _GamePageState extends State<GamePage> {
       if (!whiteMove && !_gameStart) {
         final moveNumberCaption = "${_gameLogic.fen.split(' ')[5]}.";
         setState(() {
-          _movesSans.add(moveNumberCaption);
+          _historyNodesDescriptions
+              .add(HistoryNode(caption: moveNumberCaption));
         });
       }
 
@@ -60,7 +60,8 @@ class _GamePageState extends State<GamePage> {
       final fan = san.toFan(whiteMove: !whiteMove);
 
       setState(() {
-        _movesSans.add(fan);
+        _historyNodesDescriptions
+            .add(HistoryNode(caption: fan, fen: _gameLogic.fen));
         _lastMoveToHighlight = BoardArrow(
           from: move.from,
           to: move.to,
@@ -118,8 +119,13 @@ class _GamePageState extends State<GamePage> {
   void _doStartNewGame() {
     setState(() {
       _gameLogic = chess.Chess();
+    });
+    final moveNumberCaption = "${_gameLogic.fen.split(' ')[5]}.";
+    setState(() {
       _gameStart = true;
       _lastMoveToHighlight = null;
+      _historyNodesDescriptions = [];
+      _historyNodesDescriptions.add(HistoryNode(caption: moveNumberCaption));
     });
   }
 
@@ -207,6 +213,8 @@ class _GamePageState extends State<GamePage> {
   void _onHistoryMoveRequest(
       {required Move historyMove, required int? selectedHistoryNodeIndex}) {}
 
+  void _onStopRequested() {}
+
   @override
   Widget build(BuildContext context) {
     final isPortrait =
@@ -227,6 +235,12 @@ class _GamePageState extends State<GamePage> {
             onPressed: _toggleBoardOrientation,
             icon: const Icon(
               Icons.swap_vert,
+            ),
+          ),
+          IconButton(
+            onPressed: _onStopRequested,
+            icon: const Icon(
+              Icons.back_hand,
             ),
           )
         ],
