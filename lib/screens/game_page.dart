@@ -509,7 +509,7 @@ class LandscapeWidget extends StatelessWidget {
         Expanded(
           child: LayoutBuilder(builder: (ctx2, constraints2) {
             return ChessHistory(
-              fontSize: constraints2.biggest.height * 0.1,
+              fontSize: constraints2.biggest.height * 0.07,
               nodesDescriptions: nodesDescriptions,
               scrollController: historyScrollController,
               requestGotoFirst: requestGotoFirst,
