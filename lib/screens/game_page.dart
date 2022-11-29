@@ -6,6 +6,8 @@ import 'package:simple_chess_board/simple_chess_board.dart';
 
 import '../logic/utils.dart';
 
+const emptyBoardFen = '8/8/8/8/8/8/8/8 w - - 0 1';
+
 class GamePage extends StatefulWidget {
   const GamePage({super.key});
 
@@ -14,8 +16,8 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
-  final chess.Chess _gameLogic = chess.Chess();
-  final BoardColor _orientation = BoardColor.white;
+  chess.Chess _gameLogic = chess.Chess.fromFEN(emptyBoardFen);
+  BoardColor _orientation = BoardColor.white;
   final PlayerType _whitePlayerType = PlayerType.human;
   final PlayerType _blackPlayerType = PlayerType.human;
   final List<String> _movesSans = [];
@@ -61,6 +63,65 @@ class _GamePageState extends State<GamePage> {
         _gameStart = false;
       });
     }
+  }
+
+  void _purposeStartNewGame() {
+    final bool gameStarted = _gameLogic.fen != emptyBoardFen;
+    if (gameStarted) {
+      final confirmationDialog = AlertDialog(
+        title: const Text("Start a new game ?"),
+        content: const Text(
+            "Do you want to leave current game and start a new one ?"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text(
+              "Cancel",
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _doStartNewGame();
+            },
+            child: Text(
+              "Confirm",
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ),
+        ],
+      );
+      showDialog(
+          context: context,
+          builder: (ctx) {
+            return confirmationDialog;
+          });
+    } else {
+      _doStartNewGame();
+    }
+  }
+
+  void _doStartNewGame() {
+    setState(() {
+      _gameLogic = chess.Chess();
+      _gameStart = true;
+      _lastMoveToHighlight = null;
+    });
+  }
+
+  void _toggleBoardOrientation() {
+    setState(() {
+      _orientation = _orientation == BoardColor.white
+          ? BoardColor.black
+          : BoardColor.white;
+    });
   }
 
   Future<PieceType?> _onPromote() {
@@ -133,6 +194,20 @@ class _GamePageState extends State<GamePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Game page"),
+        actions: [
+          IconButton(
+            onPressed: _purposeStartNewGame,
+            icon: const Icon(
+              Icons.start,
+            ),
+          ),
+          IconButton(
+            onPressed: _toggleBoardOrientation,
+            icon: const Icon(
+              Icons.swap_vert,
+            ),
+          )
+        ],
       ),
       body: Center(
         child: SimpleChessBoard(
