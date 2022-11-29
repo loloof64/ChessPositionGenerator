@@ -10,7 +10,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     setWindowTitle('Chess Position Generator');
-    setWindowMinSize(const Size(400, 350));
+    setWindowMinSize(const Size(400, 400));
     setWindowMaxSize(Size.infinite);
   }
 

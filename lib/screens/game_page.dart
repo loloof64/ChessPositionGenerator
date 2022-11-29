@@ -1,9 +1,13 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:chess/chess.dart' as chess;
 import 'package:chess_vectors_flutter/chess_vectors_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:simple_chess_board/models/board_arrow.dart';
 import 'package:simple_chess_board/simple_chess_board.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import 'package:chess_position_generator/components/history/history.dart';
+
 import '../logic/utils.dart';
 
 const emptyBoardFen = '8/8/8/8/8/8/8/8 w - - 0 1';
@@ -23,6 +27,8 @@ class _GamePageState extends State<GamePage> {
   final List<String> _movesSans = [];
   bool _gameStart = true;
   BoardArrow? _lastMoveToHighlight;
+  final List<HistoryNode> _historyNodesDescriptions = [];
+  final ScrollController _historyScrollController = ScrollController();
 
   void _onMove({required ShortMove move}) {
     final moveHasBeenMade = _gameLogic.move({
@@ -190,8 +196,21 @@ class _GamePageState extends State<GamePage> {
         });
   }
 
+  void _onGotoFirstHistoryNodeRequest() {}
+
+  void _onGotoPreviousHistoryNodeRequest() {}
+
+  void _onGotoNextHistoryNodeRequest() {}
+
+  void _onGotoLastHistoryNodeRequest() {}
+
+  void _onHistoryMoveRequest(
+      {required Move historyMove, required int? selectedHistoryNodeIndex}) {}
+
   @override
   Widget build(BuildContext context) {
+    final isPortrait =
+        MediaQuery.of(context).size.width < MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -213,16 +232,187 @@ class _GamePageState extends State<GamePage> {
         ],
       ),
       body: Center(
-        child: SimpleChessBoard(
-          fen: _gameLogic.fen,
-          orientation: _orientation,
-          whitePlayerType: _whitePlayerType,
-          blackPlayerType: _blackPlayerType,
-          onMove: _onMove,
-          onPromote: _onPromote,
-          lastMoveToHighlight: _lastMoveToHighlight,
-        ),
+        child: isPortrait
+            ? PortraitWidget(
+                positionFen: _gameLogic.fen,
+                boardOrientation: _orientation,
+                whitePlayerType: _whitePlayerType,
+                blackPlayerType: _blackPlayerType,
+                lastMoveToHighlight: _lastMoveToHighlight,
+                onPromote: _onPromote,
+                onMove: _onMove,
+                nodesDescriptions: _historyNodesDescriptions,
+                historyScrollController: _historyScrollController,
+                requestGotoFirst: _onGotoFirstHistoryNodeRequest,
+                requestGotoPrevious: _onGotoPreviousHistoryNodeRequest,
+                requestGotoNext: _onGotoNextHistoryNodeRequest,
+                requestGotoLast: _onGotoLastHistoryNodeRequest,
+                requestHistoryMove: _onHistoryMoveRequest,
+              )
+            : LandscapeWidget(
+                positionFen: _gameLogic.fen,
+                boardOrientation: _orientation,
+                whitePlayerType: _whitePlayerType,
+                blackPlayerType: _blackPlayerType,
+                lastMoveToHighlight: _lastMoveToHighlight,
+                onPromote: _onPromote,
+                onMove: _onMove,
+                nodesDescriptions: _historyNodesDescriptions,
+                historyScrollController: _historyScrollController,
+                requestGotoFirst: _onGotoFirstHistoryNodeRequest,
+                requestGotoPrevious: _onGotoPreviousHistoryNodeRequest,
+                requestGotoNext: _onGotoNextHistoryNodeRequest,
+                requestGotoLast: _onGotoLastHistoryNodeRequest,
+                requestHistoryMove: _onHistoryMoveRequest,
+              ),
       ),
+    );
+  }
+}
+
+class PortraitWidget extends StatelessWidget {
+  final String positionFen;
+  final BoardColor boardOrientation;
+  final PlayerType whitePlayerType;
+  final PlayerType blackPlayerType;
+  final BoardArrow? lastMoveToHighlight;
+  final void Function({required ShortMove move}) onMove;
+  final Future<PieceType?> Function() onPromote;
+
+  final List<HistoryNode> nodesDescriptions;
+  final ScrollController historyScrollController;
+  final void Function() requestGotoFirst;
+  final void Function() requestGotoPrevious;
+  final void Function() requestGotoNext;
+  final void Function() requestGotoLast;
+  final void Function(
+      {required Move historyMove,
+      required int? selectedHistoryNodeIndex}) requestHistoryMove;
+
+  const PortraitWidget({
+    super.key,
+    required this.positionFen,
+    required this.boardOrientation,
+    required this.whitePlayerType,
+    required this.blackPlayerType,
+    required this.lastMoveToHighlight,
+    required this.onPromote,
+    required this.onMove,
+    required this.nodesDescriptions,
+    required this.historyScrollController,
+    required this.requestGotoFirst,
+    required this.requestGotoPrevious,
+    required this.requestGotoNext,
+    required this.requestGotoLast,
+    required this.requestHistoryMove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Expanded(
+          child: SimpleChessBoard(
+            fen: positionFen,
+            orientation: boardOrientation,
+            whitePlayerType: whitePlayerType,
+            blackPlayerType: blackPlayerType,
+            onMove: onMove,
+            onPromote: onPromote,
+            lastMoveToHighlight: lastMoveToHighlight,
+          ),
+        ),
+        const Divider(height: 20.0),
+        Expanded(
+          flex: 1,
+          child: LayoutBuilder(builder: (ctx2, constraints2) {
+            return ChessHistory(
+              fontSize: constraints2.biggest.height * 0.1,
+              nodesDescriptions: nodesDescriptions,
+              scrollController: historyScrollController,
+              requestGotoFirst: requestGotoFirst,
+              requestGotoPrevious: requestGotoPrevious,
+              requestGotoNext: requestGotoNext,
+              requestGotoLast: requestGotoLast,
+              onHistoryMoveRequested: requestHistoryMove,
+            );
+          }),
+        ),
+      ],
+    );
+  }
+}
+
+class LandscapeWidget extends StatelessWidget {
+  final String positionFen;
+  final BoardColor boardOrientation;
+  final PlayerType whitePlayerType;
+  final PlayerType blackPlayerType;
+  final BoardArrow? lastMoveToHighlight;
+  final void Function({required ShortMove move}) onMove;
+  final Future<PieceType?> Function() onPromote;
+
+  final List<HistoryNode> nodesDescriptions;
+  final ScrollController historyScrollController;
+  final void Function() requestGotoFirst;
+  final void Function() requestGotoPrevious;
+  final void Function() requestGotoNext;
+  final void Function() requestGotoLast;
+  final void Function(
+      {required Move historyMove,
+      required int? selectedHistoryNodeIndex}) requestHistoryMove;
+
+  const LandscapeWidget({
+    super.key,
+    required this.positionFen,
+    required this.boardOrientation,
+    required this.whitePlayerType,
+    required this.blackPlayerType,
+    required this.lastMoveToHighlight,
+    required this.onPromote,
+    required this.onMove,
+    required this.nodesDescriptions,
+    required this.historyScrollController,
+    required this.requestGotoFirst,
+    required this.requestGotoPrevious,
+    required this.requestGotoNext,
+    required this.requestGotoLast,
+    required this.requestHistoryMove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        SimpleChessBoard(
+          fen: positionFen,
+          orientation: boardOrientation,
+          whitePlayerType: whitePlayerType,
+          blackPlayerType: blackPlayerType,
+          onMove: onMove,
+          onPromote: onPromote,
+          lastMoveToHighlight: lastMoveToHighlight,
+        ),
+        const Divider(height: 20.0),
+        Expanded(
+          child: LayoutBuilder(builder: (ctx2, constraints2) {
+            return ChessHistory(
+              fontSize: constraints2.biggest.height * 0.1,
+              nodesDescriptions: nodesDescriptions,
+              scrollController: historyScrollController,
+              requestGotoFirst: requestGotoFirst,
+              requestGotoPrevious: requestGotoPrevious,
+              requestGotoNext: requestGotoNext,
+              requestGotoLast: requestGotoLast,
+              onHistoryMoveRequested: requestHistoryMove,
+            );
+          }),
+        ),
+      ],
     );
   }
 }
