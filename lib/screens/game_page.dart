@@ -31,8 +31,6 @@ import 'package:chess_position_generator/components/history/history.dart';
 
 import '../logic/utils.dart';
 
-const emptyBoardFen = '8/8/8/8/8/8/8/8 w - - 0 1';
-
 class GamePage extends ConsumerStatefulWidget {
   const GamePage({super.key});
 
@@ -41,16 +39,23 @@ class GamePage extends ConsumerStatefulWidget {
 }
 
 class _GamePageState extends ConsumerState<GamePage> {
-  chess.Chess _gameLogic = chess.Chess.fromFEN(emptyBoardFen);
+  late chess.Chess _gameLogic;
   BoardColor _orientation = BoardColor.white;
   final PlayerType _whitePlayerType = PlayerType.human;
   final PlayerType _blackPlayerType = PlayerType.human;
   bool _gameStart = true;
-  bool _gameInProgress = false;
+  bool _gameInProgress = true;
   BoardArrow? _lastMoveToHighlight;
   List<HistoryNode> _historyhistoryNodesDescriptions = [];
   final ScrollController _historyScrollController = ScrollController();
   int? _selectedHistoryItemIndex = -1;
+
+  @override
+  void initState() {
+    final startPosition = ref.read(gameProvider).startPosition;
+    _gameLogic = chess.Chess.fromFEN(startPosition);
+    super.initState();
+  }
 
   void _onMove({required ShortMove move}) {
     final moveHasBeenMade = _gameLogic.move({
@@ -106,47 +111,42 @@ class _GamePageState extends ConsumerState<GamePage> {
   }
 
   void _purposeStartNewGame() {
-    final bool gameStarted = _gameLogic.fen != emptyBoardFen;
-    if (gameStarted) {
-      final confirmationDialog = AlertDialog(
-        title: Text(AppLocalizations.of(context)!.gamePage_newGame_title),
-        content: Text(
-          AppLocalizations.of(context)!.gamePage_newGame_message,
+    final confirmationDialog = AlertDialog(
+      title: Text(AppLocalizations.of(context)!.gamePage_newGame_title),
+      content: Text(
+        AppLocalizations.of(context)!.gamePage_newGame_message,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            AppLocalizations.of(context)!.buttons_cancel,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.error,
+            ),
+          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text(
-              AppLocalizations.of(context)!.buttons_cancel,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
-              ),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            _doStartNewGame();
+          },
+          child: Text(
+            AppLocalizations.of(context)!.buttons_ok,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _doStartNewGame();
-            },
-            child: Text(
-              AppLocalizations.of(context)!.buttons_ok,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-          ),
-        ],
-      );
-      showDialog(
-          context: context,
-          builder: (ctx) {
-            return confirmationDialog;
-          });
-    } else {
-      _doStartNewGame();
-    }
+        ),
+      ],
+    );
+    showDialog(
+        context: context,
+        builder: (ctx) {
+          return confirmationDialog;
+        });
   }
 
   void _doStartNewGame() {
@@ -373,8 +373,7 @@ class _GamePageState extends ConsumerState<GamePage> {
       {required Move historyMove, required int? selectedHistoryNodeIndex}) {}
 
   void _onStopRequested() {
-    final noGameRunning =
-        (_gameLogic.fen == emptyBoardFen) || (_gameInProgress == false);
+    final noGameRunning = _gameInProgress == false;
     if (noGameRunning) return;
 
     final confirmDialog = AlertDialog(
