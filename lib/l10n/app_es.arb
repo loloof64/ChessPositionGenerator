@@ -16,5 +16,7 @@
     "gamePage_stalemate": "Ahogado.",
     "gamePage_threeFoldRepetition": "Tablas por repetición triple.",
     "gamePage_missingMaterial": "Tablas por material faltante.",
-    "gamePage_fiftyMovesRule": "Tablas según la regla de los 50 movimientos."
+    "gamePage_fiftyMovesRule": "Tablas según la regla de los 50 movimientos.",
+    "gamePage_goalWin": "Objetivo: ganar",
+    "gamePage_goalDraw": "Objetivo: empate"
   } 

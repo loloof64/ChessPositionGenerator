@@ -16,5 +16,7 @@
   "gamePage_stalemate": "Stalemate.",
   "gamePage_threeFoldRepetition": "Draw by three-fold repetition.",
   "gamePage_missingMaterial": "Draw by missing material.",
-  "gamePage_fiftyMovesRule": "Draw by the 50 moves rule."
+  "gamePage_fiftyMovesRule": "Draw by the 50 moves rule.",
+  "gamePage_goalWin": "Goal : win",
+  "gamePage_goalDraw": "Goal : make draw"
 } 

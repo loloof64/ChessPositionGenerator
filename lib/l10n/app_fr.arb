@@ -16,5 +16,7 @@
     "gamePage_stalemate": "Pat.",
     "gamePage_threeFoldRepetition": "Nulle par triple répétition.",
     "gamePage_missingMaterial": "Nulle par insuffisance matérielle.",
-    "gamePage_fiftyMovesRule": "Nulle par la règle des 50 coups."
+    "gamePage_fiftyMovesRule": "Nulle par la règle des 50 coups.",
+    "gamePage_goalWin": "Objectif: victoire",
+    "gamePage_goalDraw": "Objectif: nulle"
   } 
