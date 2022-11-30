@@ -24,7 +24,7 @@ class HomePage extends StatelessWidget {
                   icon: FaIcon(FontAwesomeIcons.gift),
                 ),
                 Tab(
-                  icon: FaIcon(FontAwesomeIcons.toolbox),
+                  icon: FaIcon(FontAwesomeIcons.hammer),
                 ),
               ],
             )),
@@ -42,7 +42,7 @@ class HomePage extends StatelessWidget {
 class SamplePositions extends StatelessWidget {
   final List<GameFileData> items = <GameFileData>[
     GameFileData(
-      caption: 'Q+K/K',
+      caption: 'Queen+King/King',
       path: File('/home/test'),
     ),
   ];
