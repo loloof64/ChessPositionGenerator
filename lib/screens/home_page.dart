@@ -1,10 +1,12 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
+import 'package:chess_position_generator/logic/providers/game_provider.dart';
 import 'package:chess_position_generator/screens/game_page.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -39,7 +41,7 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class SamplePositions extends StatelessWidget {
+class SamplePositions extends ConsumerWidget {
   final List<GameFileData> items = <GameFileData>[
     GameFileData(
       caption: 'Queen+King/King',
@@ -52,11 +54,15 @@ class SamplePositions extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ListView.builder(
       itemBuilder: (ctx, index) {
         return ListTile(
           onTap: () {
+            final gameNotifier = ref.read(gameProvider.notifier);
+            gameNotifier
+                .updateStartPosition('8/8/8/4k3/8/8/2Q5/4K3 w - - 0 12');
+            gameNotifier.updateGoal(Goal.win);
             Navigator.of(context).push(
               MaterialPageRoute(builder: (ctx) => const GamePage()),
             );

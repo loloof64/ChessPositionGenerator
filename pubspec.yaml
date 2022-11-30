@@ -47,6 +47,7 @@ dependencies:
   tuple: ^2.0.1
   font_awesome_flutter: ^10.2.1
   flutter_svg: ^1.1.6
+  flutter_riverpod: ^2.1.1
 
 
   # The following adds the Cupertino Icons font to your application.

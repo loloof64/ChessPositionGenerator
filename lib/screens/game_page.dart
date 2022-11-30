@@ -17,9 +17,11 @@
 */
 
 import 'package:chess/chess.dart' as chess;
+import 'package:chess_position_generator/logic/providers/game_provider.dart';
 import 'package:chess_vectors_flutter/chess_vectors_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:simple_chess_board/models/board_arrow.dart';
 import 'package:simple_chess_board/simple_chess_board.dart';
 import 'package:collection/collection.dart';
@@ -31,16 +33,15 @@ import '../logic/utils.dart';
 
 const emptyBoardFen = '8/8/8/8/8/8/8/8 w - - 0 1';
 
-class GamePage extends StatefulWidget {
+class GamePage extends ConsumerStatefulWidget {
   const GamePage({super.key});
 
   @override
-  State<GamePage> createState() => _GamePageState();
+  ConsumerState<GamePage> createState() => _GamePageState();
 }
 
-class _GamePageState extends State<GamePage> {
+class _GamePageState extends ConsumerState<GamePage> {
   chess.Chess _gameLogic = chess.Chess.fromFEN(emptyBoardFen);
-  final _startPosition = chess.Chess.DEFAULT_POSITION;
   BoardColor _orientation = BoardColor.white;
   final PlayerType _whitePlayerType = PlayerType.human;
   final PlayerType _blackPlayerType = PlayerType.human;
@@ -149,8 +150,9 @@ class _GamePageState extends State<GamePage> {
   }
 
   void _doStartNewGame() {
+    final startPosition = ref.read(gameProvider).startPosition;
     setState(() {
-      _gameLogic = chess.Chess.fromFEN(_startPosition);
+      _gameLogic = chess.Chess.fromFEN(startPosition);
     });
     final moveNumberCaption = "${_gameLogic.fen.split(' ')[5]}.";
     setState(() {
@@ -269,10 +271,11 @@ class _GamePageState extends State<GamePage> {
 
   void _selectFirstGamePosition() {
     if (_gameInProgress) return;
+    final startPosition = ref.read(gameProvider).startPosition;
     setState(() {
       _selectedHistoryItemIndex = null;
       _lastMoveToHighlight = null;
-      _gameLogic = chess.Chess.fromFEN(_startPosition);
+      _gameLogic = chess.Chess.fromFEN(startPosition);
     });
   }
 
@@ -286,10 +289,11 @@ class _GamePageState extends State<GamePage> {
     */
     if (_selectedHistoryItemIndex! < 2) {
       // selecting first game position
+      final startPosition = ref.read(gameProvider).startPosition;
       setState(() {
         _selectedHistoryItemIndex = null;
         _lastMoveToHighlight = null;
-        _gameLogic = chess.Chess.fromFEN(_startPosition);
+        _gameLogic = chess.Chess.fromFEN(startPosition);
       });
       return;
     }

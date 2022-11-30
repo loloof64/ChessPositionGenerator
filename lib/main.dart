@@ -22,6 +22,7 @@ import 'package:chess_position_generator/screens/home_page.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_size/window_size.dart';
 
 void main() {
@@ -40,13 +41,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: FlexThemeData.light(scheme: FlexScheme.bigStone),
-      darkTheme: FlexThemeData.dark(scheme: FlexScheme.bigStone),
-      home: const HomePage(),
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
+    return ProviderScope(
+      child: MaterialApp(
+        title: 'Chess Position Generator',
+        theme: FlexThemeData.light(scheme: FlexScheme.bigStone),
+        darkTheme: FlexThemeData.dark(scheme: FlexScheme.bigStone),
+        home: const HomePage(),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+      ),
     );
   }
 }
