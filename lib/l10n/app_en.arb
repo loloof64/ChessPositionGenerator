@@ -3,6 +3,8 @@
   "black_side": "blacks",
   "buttons_ok": "Confirm",
   "buttons_cancel": "Cancel",
+  "mainPage_title": "Position selection page",
+  "mainPage_emptyListView": "No item available",
   "gamePage_title": "Game page",
   "gamePage_newGame_title": "Start a new game ?",
   "gamePage_newGame_message": "Do you want to leave current game and start a new one ?",

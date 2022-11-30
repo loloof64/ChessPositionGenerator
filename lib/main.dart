@@ -18,11 +18,11 @@
 
 import 'dart:io';
 
-import 'package:chess_position_generator/screens/game_page.dart';
-import 'package:flutter/material.dart';
-import 'package:window_size/window_size.dart';
+import 'package:chess_position_generator/screens/home_page.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:window_size/window_size.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: FlexThemeData.light(scheme: FlexScheme.bigStone),
       darkTheme: FlexThemeData.dark(scheme: FlexScheme.bigStone),
-      home: const GamePage(),
+      home: const HomePage(),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
     );

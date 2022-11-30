@@ -3,6 +3,8 @@
     "black_side": "los negros",
     "buttons_ok": "Confirmar",
     "buttons_cancel": "Cancelar",
+    "mainPage_title": "Página de selección de posición",
+    "mainPage_emptyListView": "Ningún archivo disponible.",
     "gamePage_title": "Página del juego",
     "gamePage_newGame_title": "¿Empezar un nuevo juego?",
     "gamePage_newGame_message": "¿Quieres salir del juego actual y comenzar uno nuevo?",

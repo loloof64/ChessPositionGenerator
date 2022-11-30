@@ -3,6 +3,8 @@
     "black_side": "les Noirs",
     "buttons_ok": "Confirmer",
     "buttons_cancel": "Annuler",
+    "mainPage_title": "Page de sélection de la position",
+    "mainPage_emptyListView": "Aucun fichier disponible.",
     "gamePage_title": "Page de jeu",
     "gamePage_newGame_title": "Commencer une nouvelle partie ?",
     "gamePage_newGame_message": "Souhaitez-vous commencer une nouvelle partie et quitter la partie actuelle ?",
