@@ -428,6 +428,7 @@ class _GamePageState extends ConsumerState<GamePage> {
   Widget build(BuildContext context) {
     final isPortrait =
         MediaQuery.of(context).size.width < MediaQuery.of(context).size.height;
+    final gameGoal = ref.read(gameProvider).goal;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -465,6 +466,7 @@ class _GamePageState extends ConsumerState<GamePage> {
                 lastMoveToHighlight: _lastMoveToHighlight,
                 onPromote: _onPromote,
                 onMove: _onMove,
+                gameGoal: gameGoal,
                 historySelectedNodeIndex: _selectedHistoryItemIndex,
                 historyNodesDescriptions: _historyhistoryNodesDescriptions,
                 historyScrollController: _historyScrollController,
@@ -483,6 +485,7 @@ class _GamePageState extends ConsumerState<GamePage> {
                 lastMoveToHighlight: _lastMoveToHighlight,
                 onPromote: _onPromote,
                 onMove: _onMove,
+                gameGoal: gameGoal,
                 historySelectedNodeIndex: _selectedHistoryItemIndex,
                 historyNodesDescriptions: _historyhistoryNodesDescriptions,
                 historyScrollController: _historyScrollController,
@@ -507,6 +510,8 @@ class PortraitWidget extends StatelessWidget {
   final void Function({required ShortMove move}) onMove;
   final Future<PieceType?> Function() onPromote;
 
+  final Goal gameGoal;
+
   final int? historySelectedNodeIndex;
   final List<HistoryNode> historyNodesDescriptions;
   final ScrollController historyScrollController;
@@ -528,6 +533,7 @@ class PortraitWidget extends StatelessWidget {
     required this.lastMoveToHighlight,
     required this.onPromote,
     required this.onMove,
+    required this.gameGoal,
     required this.historySelectedNodeIndex,
     required this.historyNodesDescriptions,
     required this.historyScrollController,
@@ -540,6 +546,9 @@ class PortraitWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final goalText = gameGoal == Goal.win
+        ? AppLocalizations.of(context)!.gamePage_goalWin
+        : AppLocalizations.of(context)!.gamePage_goalDraw;
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -555,6 +564,13 @@ class PortraitWidget extends StatelessWidget {
             onMove: onMove,
             onPromote: onPromote,
             lastMoveToHighlight: lastMoveToHighlight,
+          ),
+        ),
+        const Divider(height: 20.0),
+        Text(
+          goalText,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
           ),
         ),
         const Divider(height: 20.0),
@@ -589,6 +605,8 @@ class LandscapeWidget extends StatelessWidget {
   final void Function({required ShortMove move}) onMove;
   final Future<PieceType?> Function() onPromote;
 
+  final Goal gameGoal;
+
   final int? historySelectedNodeIndex;
   final List<HistoryNode> historyNodesDescriptions;
   final ScrollController historyScrollController;
@@ -610,6 +628,7 @@ class LandscapeWidget extends StatelessWidget {
     required this.lastMoveToHighlight,
     required this.onPromote,
     required this.onMove,
+    required this.gameGoal,
     required this.historySelectedNodeIndex,
     required this.historyNodesDescriptions,
     required this.historyScrollController,
@@ -622,6 +641,9 @@ class LandscapeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final goalText = gameGoal == Goal.win
+        ? AppLocalizations.of(context)!.gamePage_goalWin
+        : AppLocalizations.of(context)!.gamePage_goalDraw;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -637,21 +659,38 @@ class LandscapeWidget extends StatelessWidget {
           onPromote: onPromote,
           lastMoveToHighlight: lastMoveToHighlight,
         ),
-        const Divider(height: 20.0),
+        const SizedBox(
+          width: 20.0,
+        ),
         Expanded(
-          child: LayoutBuilder(builder: (ctx2, constraints2) {
-            return ChessHistory(
-              fontSize: constraints2.biggest.height * 0.07,
-              selectedNodeIndex: historySelectedNodeIndex,
-              nodesDescriptions: historyNodesDescriptions,
-              scrollController: historyScrollController,
-              requestGotoFirst: requestGotoFirst,
-              requestGotoPrevious: requestGotoPrevious,
-              requestGotoNext: requestGotoNext,
-              requestGotoLast: requestGotoLast,
-              onHistoryMoveRequested: requestHistoryMove,
-            );
-          }),
+          child: Column(
+            children: [
+              Text(
+                goalText,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Divider(
+                height: 20.0,
+              ),
+              Expanded(
+                child: LayoutBuilder(builder: (ctx2, constraints2) {
+                  return ChessHistory(
+                    fontSize: constraints2.biggest.height * 0.07,
+                    selectedNodeIndex: historySelectedNodeIndex,
+                    nodesDescriptions: historyNodesDescriptions,
+                    scrollController: historyScrollController,
+                    requestGotoFirst: requestGotoFirst,
+                    requestGotoPrevious: requestGotoPrevious,
+                    requestGotoNext: requestGotoNext,
+                    requestGotoLast: requestGotoLast,
+                    onHistoryMoveRequested: requestHistoryMove,
+                  );
+                }),
+              ),
+            ],
+          ),
         ),
       ],
     );
