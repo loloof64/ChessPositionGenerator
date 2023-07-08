@@ -3,6 +3,7 @@
   "black_side": "blacks",
   "buttons_ok": "Confirm",
   "buttons_cancel": "Cancel",
+  "buttons_select": "Select",
   "mainPage_title": "Position selection page",
   "mainPage_emptyListView": "No item available",
   "gamePage_title": "Game page",
@@ -18,5 +19,8 @@
   "gamePage_missingMaterial": "Draw by missing material.",
   "gamePage_fiftyMovesRule": "Draw by the 50 moves rule.",
   "gamePage_goalWin": "Goal : win",
-  "gamePage_goalDraw": "Goal : make draw"
+  "gamePage_goalDraw": "Goal : make draw",
+  "optionsPage_title": "Preferences",
+  "optionsPage_wrongUciProgram": "Selected program is not a valid UCI program, or failed to launch.",
+  "optionsPage_enginePathHint" : "UCI engine path"
 } 

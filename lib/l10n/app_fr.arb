@@ -3,6 +3,7 @@
     "black_side": "les Noirs",
     "buttons_ok": "Confirmer",
     "buttons_cancel": "Annuler",
+    "buttons_select": "Choisir",
     "mainPage_title": "Page de sélection de la position",
     "mainPage_emptyListView": "Aucun fichier disponible.",
     "gamePage_title": "Page de jeu",
@@ -18,5 +19,8 @@
     "gamePage_missingMaterial": "Nulle par insuffisance matérielle.",
     "gamePage_fiftyMovesRule": "Nulle par la règle des 50 coups.",
     "gamePage_goalWin": "Objectif: victoire",
-    "gamePage_goalDraw": "Objectif: nulle"
+    "gamePage_goalDraw": "Objectif: nulle",
+    "optionsPage_title": "Préférences",
+    "optionsPage_wrongUciProgram": "Le programme selectionné n'est pas un programme UCI valide, ou n'a pas pu être lancé.",
+    "optionsPage_enginePathHint" : "Chemin du moteur UCI"
   } 

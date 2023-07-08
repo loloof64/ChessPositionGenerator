@@ -3,6 +3,7 @@
     "black_side": "los negros",
     "buttons_ok": "Confirmar",
     "buttons_cancel": "Cancelar",
+    "buttons_select": "Elegir",
     "mainPage_title": "Página de selección de posición",
     "mainPage_emptyListView": "Ningún archivo disponible.",
     "gamePage_title": "Página del juego",
@@ -18,5 +19,8 @@
     "gamePage_missingMaterial": "Tablas por material faltante.",
     "gamePage_fiftyMovesRule": "Tablas según la regla de los 50 movimientos.",
     "gamePage_goalWin": "Objetivo: ganar",
-    "gamePage_goalDraw": "Objetivo: empate"
+    "gamePage_goalDraw": "Objetivo: empate",
+    "optionsPage_title": "Preferencias",
+    "optionsPage_wrongUciProgram": "El programa seleccionado no es un programa UCI válido o no pudo iniciarse.",
+    "optionsPage_enginePathHint" : "Ruta del motor UCI"
   } 

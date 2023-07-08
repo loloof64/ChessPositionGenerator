@@ -21,6 +21,7 @@ import 'dart:io';
 
 import 'package:chess_position_generator/logic/providers/game_provider.dart';
 import 'package:chess_position_generator/screens/game_page.dart';
+import 'package:chess_position_generator/screens/options_page.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -31,6 +32,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
+  void _openPreferencesPage(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context2) => const OptionsPage(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -38,6 +47,14 @@ class HomePage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
             title: Text(AppLocalizations.of(context)!.mainPage_title),
+            actions: [
+              IconButton(
+                onPressed: () => _openPreferencesPage(context),
+                icon: const Icon(
+                  Icons.settings,
+                ),
+              ),
+            ],
             bottom: const TabBar(
               tabs: <Tab>[
                 Tab(
