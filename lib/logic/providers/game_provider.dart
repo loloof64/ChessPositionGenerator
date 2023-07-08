@@ -31,19 +31,23 @@ enum Goal {
 class Game {
   final String startPosition;
   final Goal goal;
+  final bool playerHasWhite;
 
   const Game({
     required this.startPosition,
     required this.goal,
+    required this.playerHasWhite,
   });
 
   Game copyWith({
     String? startPosition,
     Goal? goal,
+    bool? playerHasWhite,
   }) {
     return Game(
       startPosition: startPosition ?? this.startPosition,
       goal: goal ?? this.goal,
+      playerHasWhite: playerHasWhite ?? this.playerHasWhite,
     );
   }
 
@@ -51,6 +55,7 @@ class Game {
     return <String, String>{
       'startPosition': startPosition,
       'goal': goal.toString(),
+      'playerHasWhite': playerHasWhite.toString(),
     };
   }
 
@@ -58,9 +63,11 @@ class Game {
     final goalStr = map['goal'];
     final goalValue =
         Goal.values.firstWhere((goal) => goal.toString() == 'Goal.$goalStr');
+    final playerHasWhite = map['playerHasWhite']!.toLowerCase() == "true";
     return Game(
       startPosition: map['startPosition'] as String,
       goal: goalValue,
+      playerHasWhite: playerHasWhite,
     );
   }
 
@@ -91,6 +98,7 @@ class GameNotifier extends StateNotifier<Game> {
           const Game(
             startPosition: _emptyPosition,
             goal: Goal.win,
+            playerHasWhite: true,
           ),
         );
 
@@ -100,6 +108,10 @@ class GameNotifier extends StateNotifier<Game> {
 
   void updateGoal(Goal newGoal) {
     state = state.copyWith(goal: newGoal);
+  }
+
+  void updatePlayerHasWhite(bool hasWhite) {
+    state = state.copyWith(playerHasWhite: hasWhite);
   }
 }
 

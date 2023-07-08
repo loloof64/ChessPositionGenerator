@@ -148,6 +148,7 @@ class _SamplePositionsState extends ConsumerState<SamplePositions> {
               gameNotifier
                   .updateStartPosition('8/8/8/4k3/8/8/2Q5/4K3 w - - 0 12');
               gameNotifier.updateGoal(Goal.win);
+              gameNotifier.updatePlayerHasWhite(true);
               if (!mounted) return;
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (ctx) => const GamePage()),

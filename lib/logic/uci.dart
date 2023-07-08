@@ -26,7 +26,7 @@ Future<bool> checkUciPath(String absolutePath) async {
     var result = false;
     final process = await Process.start(absolutePath, <String>[]);
     process.stdin.write("isready\n");
-    process.stdin.flush();
+    await process.stdin.flush();
     process.stdout.transform(utf8.decoder).listen((line) {
       if (line.trim() == "readyok") result = true;
     });
@@ -53,13 +53,14 @@ class UciManager {
     }
   }
 
-  void setCustomPosition(String positionFen) {
-    _sendCommand("position fen $positionFen");
+  Future<void> setCustomPosition(String positionFen) async {
+    await _sendCommand("position fen $positionFen");
+    return Future.value();
   }
 
   Future<String> getBestMoveUci({int moveTimeMillis = 1000}) async {
     _isDirty = true;
-    _sendCommand("go movetime $moveTimeMillis");
+    await _sendCommand("go movetime $moveTimeMillis");
     while (_isDirty) {
       await Future.delayed(
         const Duration(milliseconds: 10),
@@ -71,11 +72,14 @@ class UciManager {
   Future<Process> _startProcess(String path) async {
     try {
       final process = await Process.start(path, <String>[]);
-      process.stdout.transform(utf8.decoder).listen((line) {
-        _handleProcessLine(line);
+      process.stdout.transform(utf8.decoder).listen((content) {
+        final lines = content.split(RegExp("[\r\n]"));
+        for (final line in lines) {
+          _handleProcessLine(line);
+        }
       });
       process.stdin.write("isready\n");
-      process.stdin.flush();
+      await process.stdin.flush();
       return Future.value(process);
     } catch (ex) {
       return Future.error("failed to create process");
@@ -92,9 +96,10 @@ class UciManager {
     }
   }
 
-  void _sendCommand(String command) {
+  Future<void> _sendCommand(String command) async {
     if (!_isReady) return;
     _process.stdin.write("$command\n");
-    _process.stdin.flush();
+    await _process.stdin.flush();
+    return Future.value();
   }
 }
