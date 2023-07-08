@@ -139,14 +139,33 @@ class _OptionsPageState extends State<OptionsPage> {
                 children: [
                   ElevatedButton(
                     onPressed: _cancel,
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                        Colors.redAccent,
+                      ),
+                    ),
                     child: Text(
                       AppLocalizations.of(context)?.buttons_cancel ?? 'Cancel',
+                      style: const TextStyle(
+                        color: Colors.white,
+                      ),
                     ),
+                  ),
+                  const SizedBox(
+                    width: 30.0,
                   ),
                   ElevatedButton(
                     onPressed: _validate,
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                        Colors.greenAccent,
+                      ),
+                    ),
                     child: Text(
                       AppLocalizations.of(context)?.buttons_ok ?? 'Ok',
+                      style: const TextStyle(
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ],
