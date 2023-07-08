@@ -53,6 +53,7 @@ class _GamePageState extends ConsumerState<GamePage> {
   final ScrollController _historyScrollController = ScrollController();
   int? _selectedHistoryItemIndex = -1;
   late UciManager _uciManager;
+  bool _engineThinking = false;
 
   @override
   void initState() {
@@ -148,6 +149,9 @@ class _GamePageState extends ConsumerState<GamePage> {
         (iswhiteTurn && _whitePlayerType == PlayerType.computer) ||
             (!iswhiteTurn && _blackPlayerType == PlayerType.computer);
     if (!isComputerTurn) return;
+    setState(() {
+      _engineThinking = true;
+    });
     await _uciManager
         .setCustomPosition(_gameLogic?.fen ?? chess.Chess.DEFAULT_POSITION);
     final moveUci = await _uciManager.getBestMoveUci();
@@ -158,6 +162,9 @@ class _GamePageState extends ConsumerState<GamePage> {
       'from': startSquareStr,
       'to': endSquareStr,
       'promotion': promotionStr,
+    });
+    setState(() {
+      _engineThinking = false;
     });
     if (moveHasBeenMade) {
       final whiteMove = _gameLogic!.turn == chess.Color.WHITE;
@@ -262,6 +269,7 @@ class _GamePageState extends ConsumerState<GamePage> {
         .add(HistoryNode(caption: moveNumberCaption));
     _selectedHistoryItemIndex = -1;
     _gameInProgress = true;
+    _engineThinking = false;
   }
 
   void _toggleBoardOrientation() {
@@ -588,6 +596,7 @@ class _GamePageState extends ConsumerState<GamePage> {
                 requestGotoNext: _selectNextHistoryNode,
                 requestGotoLast: _selectLastHistoryNode,
                 requestHistoryMove: _onHistoryMoveRequest,
+                engineThinking: _engineThinking,
               )
             : LandscapeWidget(
                 gameInProgress: _gameInProgress,
@@ -607,6 +616,7 @@ class _GamePageState extends ConsumerState<GamePage> {
                 requestGotoNext: _selectNextHistoryNode,
                 requestGotoLast: _selectLastHistoryNode,
                 requestHistoryMove: _onHistoryMoveRequest,
+                engineThinking: _engineThinking,
               ),
       ),
     );
@@ -615,6 +625,7 @@ class _GamePageState extends ConsumerState<GamePage> {
 
 class PortraitWidget extends StatelessWidget {
   final bool gameInProgress;
+  final bool engineThinking;
   final String positionFen;
   final BoardColor boardOrientation;
   final PlayerType whitePlayerType;
@@ -639,6 +650,7 @@ class PortraitWidget extends StatelessWidget {
   const PortraitWidget({
     super.key,
     required this.gameInProgress,
+    required this.engineThinking,
     required this.positionFen,
     required this.boardOrientation,
     required this.whitePlayerType,
@@ -677,6 +689,7 @@ class PortraitWidget extends StatelessWidget {
             onMove: onMove,
             onPromote: onPromote,
             lastMoveToHighlight: lastMoveToHighlight,
+            engineThinking: engineThinking,
           ),
         ),
         const Divider(height: 20.0),
@@ -710,6 +723,7 @@ class PortraitWidget extends StatelessWidget {
 
 class LandscapeWidget extends StatelessWidget {
   final bool gameInProgress;
+  final bool engineThinking;
   final String positionFen;
   final BoardColor boardOrientation;
   final PlayerType whitePlayerType;
@@ -734,6 +748,7 @@ class LandscapeWidget extends StatelessWidget {
   const LandscapeWidget({
     super.key,
     required this.gameInProgress,
+    required this.engineThinking,
     required this.positionFen,
     required this.boardOrientation,
     required this.whitePlayerType,
@@ -772,6 +787,7 @@ class LandscapeWidget extends StatelessWidget {
             onMove: onMove,
             onPromote: onPromote,
             lastMoveToHighlight: lastMoveToHighlight,
+            engineThinking: engineThinking,
           ),
         ),
         const SizedBox(
