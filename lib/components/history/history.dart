@@ -1,6 +1,6 @@
 /*
     ChessPositionGenerator : generate a chess position from your criterias.
-    Copyright (C) 2022  Laurent Bernabe
+    Copyright (C) 2022-2023  Laurent Bernabe
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
