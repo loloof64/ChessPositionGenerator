@@ -472,7 +472,20 @@ class _GamePageState extends ConsumerState<GamePage> {
   }
 
   void _onHistoryMoveRequest(
-      {required Move historyMove, required int? selectedHistoryNodeIndex}) {}
+      {required Move historyMove, required int? selectedHistoryNodeIndex}) {
+    if (_gameInProgress || selectedHistoryNodeIndex == null) return;
+    final historyNode =
+        _historyhistoryNodesDescriptions[selectedHistoryNodeIndex];
+    setState(() {
+      _selectedHistoryItemIndex = selectedHistoryNodeIndex;
+      _gameLogic = chess.Chess.fromFEN(historyNode.fen!);
+      _lastMoveToHighlight = BoardArrow(
+        from: historyNode.move!.from.getUciString(),
+        to: historyNode.move!.to.getUciString(),
+        color: Colors.blueAccent,
+      );
+    });
+  }
 
   void _onStopRequested() {
     final noGameRunning = _gameInProgress == false;
