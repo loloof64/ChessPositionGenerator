@@ -44,8 +44,14 @@ class MyApp extends StatelessWidget {
     return ProviderScope(
       child: MaterialApp(
         title: 'Chess Position Generator',
-        theme: FlexThemeData.light(scheme: FlexScheme.bigStone),
-        darkTheme: FlexThemeData.dark(scheme: FlexScheme.bigStone),
+        theme: FlexThemeData.light(
+          scheme: FlexScheme.bigStone,
+          useMaterial3: true,
+        ),
+        darkTheme: FlexThemeData.dark(
+          scheme: FlexScheme.bigStone,
+          useMaterial3: true,
+        ),
         home: const HomePage(),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
