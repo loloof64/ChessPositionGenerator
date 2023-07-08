@@ -4,6 +4,7 @@
     "buttons_ok": "Confirmer",
     "buttons_cancel": "Annuler",
     "buttons_select": "Choisir",
+    "buttons_erase": "Effacer",
     "mainPage_title": "Page de sélection de la position",
     "mainPage_emptyListView": "Aucun fichier disponible.",
     "gamePage_title": "Page de jeu",

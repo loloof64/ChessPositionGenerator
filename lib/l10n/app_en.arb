@@ -4,6 +4,7 @@
   "buttons_ok": "Confirm",
   "buttons_cancel": "Cancel",
   "buttons_select": "Select",
+  "buttons_erase": "Erase",
   "mainPage_title": "Position selection page",
   "mainPage_emptyListView": "No item available",
   "gamePage_title": "Game page",

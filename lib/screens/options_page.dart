@@ -80,6 +80,12 @@ class _OptionsPageState extends State<OptionsPage> {
     }
   }
 
+  void _eraseEnginePath() async {
+    setState(() {
+      _enginePath?.text = "";
+    });
+  }
+
   void _validate() {
     if (_enginePath?.text != null) {
       _preferences?.setString(
@@ -123,6 +129,12 @@ class _OptionsPageState extends State<OptionsPage> {
                   onPressed: _selectEnginePath,
                   child: Text(
                     AppLocalizations.of(context)?.buttons_select ?? "Select",
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: _eraseEnginePath,
+                  child: Text(
+                    AppLocalizations.of(context)?.buttons_erase ?? "Erase",
                   ),
                 )
               ],
