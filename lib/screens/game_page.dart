@@ -73,7 +73,7 @@ class _GamePageState extends ConsumerState<GamePage> {
           _whitePlayerType = PlayerType.computer;
           _blackPlayerType = PlayerType.human;
         }
-        _gameLogic = chess.Chess.fromFEN(startPosition);
+        _doStartNewGame();
       });
     });
     super.initState();
@@ -230,7 +230,9 @@ class _GamePageState extends ConsumerState<GamePage> {
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
-            _doStartNewGame();
+            setState(() {
+              _doStartNewGame();
+            });
           },
           child: Text(
             AppLocalizations.of(context)!.buttons_ok,
@@ -249,21 +251,17 @@ class _GamePageState extends ConsumerState<GamePage> {
   }
 
   void _doStartNewGame() {
-    if (_gameLogic == null) return;
     final startPosition = ref.read(gameProvider).startPosition;
-    setState(() {
-      _gameLogic = chess.Chess.fromFEN(startPosition);
-    });
-    final moveNumberCaption = "${_gameLogic!.fen.split(' ')[5]}.";
-    setState(() {
-      _gameStart = true;
-      _lastMoveToHighlight = null;
-      _historyhistoryNodesDescriptions = [];
-      _historyhistoryNodesDescriptions
-          .add(HistoryNode(caption: moveNumberCaption));
-      _selectedHistoryItemIndex = -1;
-      _gameInProgress = true;
-    });
+    final newGameLogic = chess.Chess.fromFEN(startPosition);
+    final moveNumberCaption = "${newGameLogic.fen.split(' ')[5]}.";
+    _gameLogic = newGameLogic;
+    _gameStart = true;
+    _lastMoveToHighlight = null;
+    _historyhistoryNodesDescriptions = [];
+    _historyhistoryNodesDescriptions
+        .add(HistoryNode(caption: moveNumberCaption));
+    _selectedHistoryItemIndex = -1;
+    _gameInProgress = true;
   }
 
   void _toggleBoardOrientation() {
