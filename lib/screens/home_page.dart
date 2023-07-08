@@ -93,39 +93,45 @@ class SamplePositions extends ConsumerStatefulWidget {
 }
 
 class _SamplePositionsState extends ConsumerState<SamplePositions> {
-  late UciManager? _uciEngineHandler;
   SharedPreferences? _preferences;
 
   @override
   void initState() {
     SharedPreferences.getInstance().then((prefs) async {
       _preferences = prefs;
-      var error = false;
-      final enginePath = _preferences?.getString("enginePath");
-      if (enginePath != null) {
-        final goodEnginePath = await checkUciPath(enginePath);
-        if (goodEnginePath) {
-          _uciEngineHandler = UciManager(enginePath);
-        } else {
-          error = true;
-        }
-      } else {
-        error = true;
-      }
+      final error = !await _checkUciEngine();
       if (error) {
         await Future.delayed(const Duration(milliseconds: 10));
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)?.mainPage_noEngineSet ??
-                  "UCI engine is missing : please set it in the settings.",
-            ),
-          ),
-        );
+        _showEngineNotDefinedError();
       }
     });
     super.initState();
+  }
+
+  Future<bool> _checkUciEngine() async {
+    var error = false;
+    final enginePath = _preferences?.getString("enginePath");
+    if (enginePath != null) {
+      final goodEnginePath = await checkUciPath(enginePath);
+      if (!goodEnginePath) {
+        error = true;
+      }
+    } else {
+      error = true;
+    }
+    return Future.value(!error);
+  }
+
+  void _showEngineNotDefinedError() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          AppLocalizations.of(context)?.mainPage_noEngineSet ??
+              "UCI engine is missing : please set it in the settings.",
+        ),
+      ),
+    );
   }
 
   @override
@@ -134,27 +140,9 @@ class _SamplePositionsState extends ConsumerState<SamplePositions> {
       itemBuilder: (ctx, index) {
         return ListTile(
           onTap: () async {
-            var error = false;
-            final enginePath = _preferences?.getString("enginePath");
-            if (enginePath != null) {
-              final goodEnginePath = await checkUciPath(enginePath);
-              if (!goodEnginePath) {
-                error = true;
-              }
-            } else {
-              error = true;
-            }
+            final error = !await _checkUciEngine();
             if (error) {
-              await Future.delayed(const Duration(milliseconds: 10));
-              if (!mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    AppLocalizations.of(context)?.mainPage_noEngineSet ??
-                        "UCI engine is missing : please set it in the settings.",
-                  ),
-                ),
-              );
+              _showEngineNotDefinedError();
             } else {
               final gameNotifier = ref.read(gameProvider.notifier);
               gameNotifier
