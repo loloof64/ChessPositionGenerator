@@ -47,7 +47,7 @@ dependencies:
   tuple: ^2.0.1
   font_awesome_flutter: ^10.2.1
   flutter_svg: ^1.1.6
-  flutter_riverpod: ^2.1.1
+  flutter_riverpod: ^2.3.6
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -55,6 +55,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   file_picker: ^5.3.2
   shared_preferences: ^2.2.0
+  logger: ^1.4.0
 
 dev_dependencies:
   flutter_test:

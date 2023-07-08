@@ -7,6 +7,7 @@
     "buttons_erase": "Borrar",
     "mainPage_title": "Página de selección de posición",
     "mainPage_emptyListView": "Ningún archivo disponible.",
+    "mainPage_noEngineSet": "Falta el motor UCI: por favor, configúrelo en la configuración.",
     "gamePage_title": "Página del juego",
     "gamePage_newGame_title": "¿Empezar un nuevo juego?",
     "gamePage_newGame_message": "¿Quieres salir del juego actual y comenzar uno nuevo?",

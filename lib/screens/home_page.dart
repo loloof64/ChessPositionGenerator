@@ -20,6 +20,7 @@
 import 'dart:io';
 
 import 'package:chess_position_generator/logic/providers/game_provider.dart';
+import 'package:chess_position_generator/logic/uci.dart';
 import 'package:chess_position_generator/screens/game_page.dart';
 import 'package:chess_position_generator/screens/options_page.dart';
 import 'package:equatable/equatable.dart';
@@ -28,6 +29,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -76,7 +78,9 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class SamplePositions extends ConsumerWidget {
+class SamplePositions extends ConsumerStatefulWidget {
+  SamplePositions({super.key});
+
   final List<GameFileData> items = <GameFileData>[
     GameFileData(
       caption: 'Queen+King/King',
@@ -84,29 +88,89 @@ class SamplePositions extends ConsumerWidget {
     ),
   ];
 
-  SamplePositions({
-    super.key,
-  });
+  @override
+  ConsumerState<SamplePositions> createState() => _SamplePositionsState();
+}
+
+class _SamplePositionsState extends ConsumerState<SamplePositions> {
+  late UciManager? _uciEngineHandler;
+  SharedPreferences? _preferences;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void initState() {
+    SharedPreferences.getInstance().then((prefs) async {
+      _preferences = prefs;
+      var error = false;
+      final enginePath = _preferences?.getString("enginePath");
+      if (enginePath != null) {
+        final goodEnginePath = await checkUciPath(enginePath);
+        if (goodEnginePath) {
+          _uciEngineHandler = UciManager(enginePath);
+        } else {
+          error = true;
+        }
+      } else {
+        error = true;
+      }
+      if (error) {
+        await Future.delayed(const Duration(milliseconds: 10));
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)?.mainPage_noEngineSet ??
+                  "UCI engine is missing : please set it in the settings.",
+            ),
+          ),
+        );
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return ListView.builder(
       itemBuilder: (ctx, index) {
         return ListTile(
-          onTap: () {
-            final gameNotifier = ref.read(gameProvider.notifier);
-            gameNotifier
-                .updateStartPosition('8/8/8/4k3/8/8/2Q5/4K3 w - - 0 12');
-            gameNotifier.updateGoal(Goal.win);
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (ctx) => const GamePage()),
-            );
+          onTap: () async {
+            var error = false;
+            final enginePath = _preferences?.getString("enginePath");
+            if (enginePath != null) {
+              final goodEnginePath = await checkUciPath(enginePath);
+              if (!goodEnginePath) {
+                error = true;
+              }
+            } else {
+              error = true;
+            }
+            if (error) {
+              await Future.delayed(const Duration(milliseconds: 10));
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    AppLocalizations.of(context)?.mainPage_noEngineSet ??
+                        "UCI engine is missing : please set it in the settings.",
+                  ),
+                ),
+              );
+            } else {
+              final gameNotifier = ref.read(gameProvider.notifier);
+              gameNotifier
+                  .updateStartPosition('8/8/8/4k3/8/8/2Q5/4K3 w - - 0 12');
+              gameNotifier.updateGoal(Goal.win);
+              if (!mounted) return;
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (ctx) => const GamePage()),
+              );
+            }
           },
           leading: SvgPicture.asset('assets/vectors/file.svg'),
-          title: Text(items[index].caption),
+          title: Text(widget.items[index].caption),
         );
       },
-      itemCount: items.length,
+      itemCount: widget.items.length,
     );
   }
 }

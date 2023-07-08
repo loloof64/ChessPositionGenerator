@@ -7,6 +7,7 @@
     "buttons_erase": "Effacer",
     "mainPage_title": "Page de sélection de la position",
     "mainPage_emptyListView": "Aucun fichier disponible.",
+    "mainPage_noEngineSet": "Le moteur UCI n'est pas défini : veuillez le définir dans les préférences.",
     "gamePage_title": "Page de jeu",
     "gamePage_newGame_title": "Commencer une nouvelle partie ?",
     "gamePage_newGame_message": "Souhaitez-vous commencer une nouvelle partie et quitter la partie actuelle ?",
